@@ -1,0 +1,88 @@
+const int MAXN = 1000 + 10; //number of vertices
+const int INF = 1000000000;
+
+struct Edge {
+	int u, c;
+	friend bool operator<(const Edge &a, const Edge &b) { return a.c < b.c; }
+};
+
+Edge edge[MAXN][MAXN];
+int top[MAXN], add[MAXN];
+
+int set_find(int *s, int x) {
+	return s[x] == x ? x : s[x] = set_find(s, s[x]);
+}
+
+inline void set_union(int *s, int x, int y) {
+	int fx = set_find(s, x), fy = set_find(s, y);
+	if (fx != fy) s[fy] = fx;
+}
+
+void merge(int a, int b) {
+	static Edge ret[MAXN];
+	static bool used[MAXN];
+	int size = 0;
+	memset(used, 0, sizeof(used));
+	for (int i = 0; i < top[a]; ++i) edge[a][i].c += add[a];
+	for (int i = 0; i < top[b]; ++i) edge[b][i].c += add[b];
+	while (top[a] > 0 || top[b] > 0) {
+		int id = (top[a] > 0 && (top[b] == 0 || edge[a][top[a] - 1].c > edge[b][top[b] - 1].c)) ? a : b;
+		if (!used[edge[id][top[id] - 1].u]) {
+			ret[size] = edge[id][top[id] - 1];
+			used[ret[size++].u] = true;
+		}
+		--top[id];
+	}
+	top[a] = size;
+	for (int i = 0; i < size; ++i) edge[a][i] = ret[size - i - 1];
+	add[a] = 0;
+}
+
+// find maximal branchings, O(N^2)
+// make sure that there exists a solution
+// delete all edge(i, root) from c to find a rooted solution
+int optimum_branchings(int c[MAXN][MAXN], int N) {
+	static int S[MAXN], W[MAXN];
+	static Edge enter[MAXN];
+	memset(add, 0, sizeof(add));
+	memset(top, 0, sizeof(top));
+	for (int j = 0; j < N; ++j) {
+		for (int i = 0; i < N; ++i)
+			if (c[i][j] < INF) {
+				edge[j][top[j]].u = i;
+				edge[j][top[j]++].c = c[i][j];
+			}
+		sort(edge[j], edge[j] + top[j]);
+		S[j] = W[j] = j;
+		enter[j].u = -1;
+	}
+	int ret = 0;
+	for (int u = 0; u < N; ) {
+		if (top[u] == 0) {
+			++u;
+			continue;
+		}
+		Edge e = edge[u][--top[u]], t;
+		e.c += add[u];
+		if (set_find(S, e.u) != u) {
+			if (set_find(W, e.u) != set_find(W, u)) {
+				set_union(W, e.u, u);
+				enter[u++] = e;
+			}
+			else {
+				int val = e.c, v;
+				for (t = enter[set_find(S, e.u)]; t.u != -1; t = enter[set_find(S, t.u)]) val = min(val, t.c);
+
+				add[u] += val - e.c;
+				e.c -= val;
+				for (v = set_find(S, e.u), t = enter[v]; t.u != -1; v = set_find(S, t.u), t = enter[v]) {
+					add[v] += val - t.c;
+					merge(u, v);
+					set_union(S, u, v);
+				}
+			}
+			ret += e.c;
+		}
+	}
+	return ret;
+}

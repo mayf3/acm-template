@@ -1,0 +1,16 @@
+int Jacobi(int a, int n) {
+	if (a == 0) return 0;
+	if (a == 1) return 1;
+	int s, n1, a1 = a, e = 0;
+	while (!(a1 & 1)) a1 >>= 1, ++e;
+	if (!(e & 1)) s = 1;
+	else {
+		int u = n % 8;
+		if (u == 1 || u == 7) s = 1;
+		else s = -1;
+	}
+	if (n % 4 == 3 && a1 % 4 == 3) s = -s;
+	n1 = n % a1;
+	if (a1 == 1) return s;
+	return s * Jacobi(n1, a1);
+}

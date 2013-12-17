@@ -1,0 +1,10 @@
+int ELFhash(char s[]) {
+	unsigned long h = 0;
+	for (int i = 0; i < strlen(s); ++i) {
+		h = (h << 4) + s[i];
+		unsigned long g = h & 0Xf0000000L;
+		if (g) h ^= g >> 24;
+		h &= ~g;
+	}
+	return h % maxhash;
+}
