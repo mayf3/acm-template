@@ -1,5 +1,12 @@
 #include "template.cpp"
 
+/*
+ * name 	: 	spfa
+ * usage 	:	single-source shortest path, differential restraint system
+ * develop	:	small label first optimization, negative circle
+ * space complexity	:	O(|E|)
+ * time complexity	:	O(k * |E|) (where k is usually less than 2)
+ */
 const int N = 10000;
 
 int n, m;
