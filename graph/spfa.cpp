@@ -8,6 +8,7 @@
  * time complexity	:	O(k * |E|) (where k is usually less than 2)
  * checked	:	no
  */
+
 const int N = 10000;
 
 int n, m;
