@@ -4,8 +4,8 @@
  * name 	: 	spfa
  * usage 	:	single-source shortest path, differential restraint system
  * develop	:	small label first optimization, negative circle
- * space complexity	:	O(|E|)
- * time complexity	:	O(k * |E|) (where k is usually less than 2)
+ * space complexity	:	O(M)
+ * time complexity	:	O(k * M) (where k is usually less than 2)
  * checked	:	no
  */
 
