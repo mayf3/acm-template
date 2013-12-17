@@ -6,6 +6,7 @@
  * develop	:	small label first optimization, negative circle
  * space complexity	:	O(|E|)
  * time complexity	:	O(k * |E|) (where k is usually less than 2)
+ * checked	:	no
  */
 const int N = 10000;
 
