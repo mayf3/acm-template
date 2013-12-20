@@ -21,6 +21,9 @@
 #define fba(i,b,a) for(int i = (b); i >= (a); i--)
 #define MP make_pair
 #define PB push_back
+//#define PF push_front
+//#define F front
+//#define B back
 #define X first
 #define Y second
 #define Sqr(x) (x)*(x)
@@ -37,11 +40,5 @@ typedef pair<int,int> PII;
 typedef pair<PII,int> PIII;
 typedef pair<LL,int> PLI;
 typedef int T;
-//typedef vector<int> VI;
+typedef vector<int> VI;
 //typedef complex<double, double> Comp;
-
-const int N = 1000000, MD = 1000000007;
-
-int main(){
-	return 0;
-}
