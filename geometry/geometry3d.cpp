@@ -65,6 +65,7 @@ inline double operator^(Vector3 a, Vector3 b){
 inline double len(Vector3 a){
 	return sqrt(a ^ a);
 }
+
 inline double len2(Vector3 a){
 	return a ^ a;
 }
