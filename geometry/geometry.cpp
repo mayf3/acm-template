@@ -17,8 +17,8 @@ inline int sign(double x){
 }
 
 /*
- * Points */
-
+ * Point 
+ */
 struct Point{
 	double x, y;
 	Point(double x = 0, double y = 0) : x(x), y(y){}
@@ -36,6 +36,10 @@ void read(Point *p){
 
 void print(Point &p){
 	printf("%.3lf %.3lf\n", p.x, p.y);
+}
+
+Point operator+(Point a, Point b){
+	return Point(a.x + b.x, a.y + b.y);
 }
 
 Point operator-(Point a, Point b){
@@ -649,6 +653,25 @@ Circle min_circle_cover(Point p[], int n){
 	}
 }
 
-int main(){
-	return 0;
+/*
+ * new add by myf
+ */
+
+double cross(Point a, Point b){
+	return a.x * b.y - a.y * b.x;
+}
+
+/*
+ * polygon centroid
+ */
+Point polygon_centroid(Point p[], int n){
+	double w = 0;
+	Point ret;
+	for(int i = n - 1, j = 0; j < n; i = j++){
+		double a = cross(p[i], p[j]);
+		ret.x += (p[i].x + p[j].x) * a;
+		ret.y += (p[i].y + p[j].y) * a;
+		w += a;
+	}
+	return ret / 3 / w;
 }
