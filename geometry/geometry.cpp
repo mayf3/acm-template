@@ -660,18 +660,3 @@ Circle min_circle_cover(Point p[], int n){
 double cross(Point a, Point b){
 	return a.x * b.y - a.y * b.x;
 }
-
-/*
- * polygon centroid
- */
-Point polygon_centroid(Point p[], int n){
-	double w = 0;
-	Point ret;
-	for(int i = n - 1, j = 0; j < n; i = j++){
-		double a = cross(p[i], p[j]);
-		ret.x += (p[i].x + p[j].x) * a;
-		ret.y += (p[i].y + p[j].y) * a;
-		w += a;
-	}
-	return ret / 3 / w;
-}
