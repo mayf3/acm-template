@@ -134,7 +134,6 @@ double area_polygon(Point a[], int n){
 Point centroid(Point a[], int n){
 	double area = 0;
 	Point c;
-
 	for(int i = 0; i < n; i++){
 		int j = (i + 1) % n;
 		area += a[i].x * a[j].y - a[i].y * a[j].x;

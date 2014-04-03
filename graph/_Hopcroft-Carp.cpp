@@ -37,7 +37,6 @@ bool search(int u) {
 void hopcroft() {
 	memset(px, -1, sizeof(px));
 	memset(py, -1, sizeof(py));
-
 	while (1) {
 		memset(dx, 0, sizeof(dx));
 		memset(dy, 0, sizeof(dy));
