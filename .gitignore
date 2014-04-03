@@ -1,2 +1,4 @@
 .*.bak
 .*.un~
+codelibrary*
+!codelibrary.tex
