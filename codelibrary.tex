@@ -1,0 +1,175 @@
+\def\ChineseScale{1200}
+\documentclass[12pt,a4paper,titlepage]{article}
+\usepackage{times}
+
+%\usepackage{CJK}
+%CJK中文支持
+
+%=========================xeCJK设置==============================
+\usepackage{xeCJK}
+%xeCJK中文支持
+
+\def\CJKecglue{\hskip 0.15em}
+%设置 CJK 文字与西文、文字与行内数学公式之间的间距, CJK默认值是一个空格。
+
+\setCJKmainfont{Hiragino Sans GB}
+\setCJKmonofont{Hiragino Sans GB}
+%设置正文等宽族的 CJK 字体, 影响 \ttfamily 和 \texttt 的字体。 为了有利于等宽字体的 代码对齐等情形, xeCJK 在 ⟨font features⟩ 里增加了 Mono 这个选项。
+
+%\setmainfont{Courier}
+%================================================================
+
+\usepackage{latexsym,bm}
+\usepackage{indentfirst}
+%自动首行缩进
+\usepackage[top=1in, bottom=1in, left=0.5in, right=0.5in]{geometry}
+\usepackage[CJKbookmarks,colorlinks=true]{hyperref}
+
+%CJKbookmarks支持中文标签, colorlinks=true 就是把超链接的边框去掉,但字是红色的
+%用来调页边距
+\author{mayf3}
+\title{Standard Source code Library}
+
+\begin{document}
+
+%CJK的时候使用
+%\begin{CJK}{UTF8}{gbsn}
+
+\maketitle
+\tableofcontents
+
+\newpage
+\section{\LARGE 图论}
+	\subsection{最短路算法}
+    %\input{code/graph/dijkstra_stl}
+    %\input{code/graph/spfa}
+	\input{code/graph/kth_shortest_loopless_path}
+	\input{code/graph/kth_shortest_path}
+
+    \subsection{生成树}
+	\input{code/graph/mst}
+    %\input{code/graph/krusal}
+    %\input{code/graph/prim}
+	\input{code/graph/aroad}
+	%\input{code/graph/mdst}
+
+	\subsection{网络流}
+    %\input{code/graph/network_mode}
+	\input{code/graph/maxflow}
+    %\input{code/graph/sap}
+	%\input{code/graph/dinic}
+	%\input{code/graph/min_cost_max_flow}
+    %\input{code/graph/networkflow_limit}
+    %\input{code/graph/euler_circuit}
+    %\input{code/graph/network_cutpoint}
+
+	\subsection{匹配}
+    %\input{code/graph/hungarian_algorithm}
+	\input{code/graph/hopcroft_carp}
+    %\input{code/graph/km}
+	\input{code/graph/edmonds_blossom}
+
+    \subsection{图}
+	%\input{code/graph/tarjan}
+	%\input{code/graph/maxclique}
+    %\input{code/graph/kosaraju}
+    %\input{code/graph/cut_point}
+    %\input{code/graph/cut_edge}
+	%\input{code/graph/tree}
+    %\input{code/graph/hamilton}
+	%\input{code/graph/tree_divide}
+	%\input{code/graph/graph_complanation}
+	\input{code/graph/cut_point_on_directed_graph}
+
+    %\subsection{最近公共祖先算法}
+    %\input{code/graph/lca_rmq}
+    %\input{code/graph/tarjan}
+    %\input{code/graph/ancient_tree}
+
+\section{\LARGE 数据结构}
+    %\input{code/data_structure/treap}
+	%\input{code/data_structure/binary_indexed_tree}
+	%\input{code/data_structure/zkw_tree}
+    %\input{code/data_structure/bst}
+	%\input{code/data_structure/splay}
+	%\input{code/data_structure/leftist_tree}
+    %\input{code/data_structure/link_cut_tree}
+    %\input{code/data_structure/subtree_link_cut_tree}
+	%\input{code/data_structure/persistent_data_structures}
+	%\input{code/data_structure/function_segment_tree}
+	%\input{code/data_structure/function_treap}
+    %\input{code/data_structure/kthnumber}
+
+\section{\LARGE 字符串算法}
+	%\input{code/string/string}
+    %\input{code/string/min_representation}
+    %\input{code/string/kmp}
+    %\input{code/string/manacher}
+    %\input{code/string/suffix}
+	%\input{code/string/suffixautomata}
+    %\input{code/string/trie_tree}
+    %\input{code/string/trie_graph}
+
+\section{\LARGE 计算几何}
+	\subsection{基础}
+    %\input{code/geometry/geometry}
+    %\input{code/geometry/geometry3d}
+
+	\subsection{凸包}
+	%\input{code/geometry/convex}
+	%\input{code/geometry/convex3d}
+	%\input{code/geometry/dynamic_convex}
+	%\input{code/geometry/min_distance_between_two_convex_polygon}
+
+	\subsection{平面}
+	%\input{code/geometry/half_plane_intersection}
+	%\input{code/geometry/dynamic_half_plane_intersection}
+    %\input{code/geometry/polygon_core}
+	%\input{code/geometry/kd_tree}
+	%\input{code/geometry/knn}
+	%\input{code/geometry/range_tree}
+
+	\subsection{多边形和圆}
+	%\input{code/geometry/polygon_k_intersection}
+	%\input{code/geometry/circle_k_intersection}
+	%\input{code/geometry/polygon_circle_intersection}
+
+	\subsection{其他}
+	%\input{code/geometry/minium_circle_cover}
+    %\input{code/geometry/rectangular}
+	%\input{code/geometry/unionrectange}
+	%\input{code/geometry/circle_tree}
+
+\section{\LARGE 理论}
+	\subsection{数学}
+    %\input{code/theory/math_conclusion}
+
+	\subsection{数论}
+    %\input{code/theory/number_conclusion}
+	%\input{code/theory/mod}
+    %\input{code/theory/china}
+    %\input{code/theory/extended_gcd}
+    %\input{code/theory/euler}
+	%\input{code/theory/mu}
+    %\input{code/theory/head}
+	%\input{code/theory/detmod}
+
+	\subsection{博弈论}
+	%\input{code/theory/sg}
+
+    \subsection{特殊数列}
+    %\input{code/theory/fibonacci}
+    %\input{code/theory/catalan}
+    %\input{code/theory/stirling}
+	%\input{code/theory/schroder}
+
+\section{\LARGE 其他}
+    %\input{code/other/biginteger}
+    %\input{code/other/fft}
+    %\input{code/other/c++note}
+    %\input{code/other/editplus}
+    %\input{code/other/vim}
+
+%CJK的时候使用
+%\end{CJK}
+\end{document}
