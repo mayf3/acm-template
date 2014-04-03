@@ -1,0 +1,99 @@
+const int MAXN = 1000; //number of vertices
+const int MAXM = 10000; //number of edges
+const int MAXQ = 10000; //length of queue
+const int INF = 2000000000; //max capacity
+
+struct Tedge {
+	int v, f, c, w, next;
+};
+
+Tedge edge[MAXM];
+int first[MAXN], dist[MAXN], path[MAXN], heap[MAXN], pos[MAXN], phi[MAXN];
+int Q[MAXQ];
+bool inq[MAXN];
+int N, M, S, T, cnt;
+
+inline void add_edge(int u, int v, int c, int w) {
+	edge[M].v = v; edge[M].f = 0; edge[M].c = c; edge[M].w = w; edge[M].next = first[u]; first[u] = M++;
+	edge[M].v = u; edge[M].f = 0; edge[M].c = 0; edge[M].w = -w; edge[M].next = first[v]; first[v] = M++;
+}
+
+inline void moveup(int i) {
+	int key = heap[i];
+	for (int j; (j = i >> 1) > 0 && dist[heap[j]] > dist[key]; i = j) heap[i] = heap[j], pos[heap[i]] = i;
+	heap[i] = key; pos[key] = i;
+}
+
+inline void movedown(int i) {
+	int key = heap[i];
+	for (int j; (j = i << 1) <= cnt; i = j) {
+		if (j < cnt && dist[heap[j + 1]] < dist[heap[j]]) ++j;
+		if (dist[key] <= dist[heap[j]]) break;
+		heap[i] = heap[j]; pos[heap[i]] = i;
+	}
+	heap[i] = key; pos[key] = i;
+}
+
+bool find_path1() {
+	for (int i = 0; i < N; ++i) dist[i] = INF, inq[i] = 0;
+	dist[S] = 0; inq[S] = 1; Q[0] = S;
+	for (int h = 0, t = 1; h != t; ) {
+		int u = Q[h++];
+		if (h == MAXQ) h = 0;
+		for (int i = first[u]; i != -1; i = edge[i].next) {
+			int v = edge[i].v;
+			if (edge[i].f < edge[i].c && dist[u] + edge[i].w < dist[v]) {
+				dist[v] = dist[u] + edge[i].w; path[v] = i;
+				if (!inq[v]) {
+					inq[v] = 1;
+					if (h != t && dist[v] <= dist[Q[h]]) {
+						if ((--h) < 0) h = MAXQ - 1;
+						Q[h] = v;
+					}
+					else {
+						Q[t++] = v;
+						if (t == MAXQ) t = 0;
+					}
+				}
+			}
+		}
+		inq[u] = 0;
+	}
+	return dist[T] < INF;
+}
+
+bool find_path2() {
+	for (int i = 0; i < N; ++i) pos[i] = -1, dist[i] = INF;
+	cnt = 1; heap[1] = S; dist[S] = 0;
+	while (cnt) {
+		int u = heap[1]; heap[1] = heap[cnt--]; movedown(1);
+		for (int i = first[u]; i != -1; i = edge[i].next) {
+			int v = edge[i].v;
+			if (edge[i].f < edge[i].c && dist[u] + edge[i].w - phi[u] + phi[v] < dist[v]) {
+				dist[v] = dist[u] + edge[i].w - phi[u] + phi[v]; path[v] = i;
+				if (pos[v] == -1) pos[v] = ++cnt, heap[cnt] = v;
+				moveup(pos[v]);
+			}
+		}
+	}
+	return dist[T] < INF;
+}
+
+int Mincost() {
+	int ret = 0;
+	memset(phi, 0, sizeof(phi));
+	bool first = 1;
+	while (1) {
+		if (first) {
+			if (!find_path1()) break;
+			first = 0;
+		}
+		else if (!find_path2()) break;
+		int delta = INF;
+		for (int u = T, i = path[u]; u != S; u = edge[i ^ 1].v, i = path[u]) delta = min(delta, edge[i].c - edge[i].f);
+		for (int u = T, i = path[u]; u != S; u = edge[i ^ 1].v, i = path[u]) edge[i].f += delta, edge[i ^ 1].f -= delta;
+		ret += delta * (dist[T] - phi[T]);
+		for (int i = 0; i < N; ++i) phi[i] -= dist[i];
+	}
+	return ret;
+}

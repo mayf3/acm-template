@@ -1,0 +1,56 @@
+const int maxn = 10000 + 10;
+const double PI = acos(-1.0);
+const double EPS = 1E-6;
+
+struct Tpoint {
+	double x, y;
+};
+
+Tpoint a[maxn], b[maxn];
+int n, m;
+
+inline double cross(double X1, double Y1, double X2, double Y2) {
+	return X1 * Y2 - X2 * Y1;
+}
+
+double Area(Tpoint *a, int n) {
+	double ret = 0;
+	a[n] = a[0];
+	for (int i = 0; i < n; ++i) ret += cross(a[i].x, a[i].y, a[i + 1].x, a[i + 1].y);
+	return ret;
+}
+
+inline double Dist(Tpoint A, Tpoint B) {
+	return sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
+}
+
+inline double DistP2S(Tpoint P, Tpoint A, Tpoint B) {
+	if ((B.x - A.x) * (P.x - A.x) + (B.y - A.y) * (P.y - A.y) < 0) return Dist(P, A);
+	if ((A.x - B.x) * (P.x - B.x) + (A.y - B.y) * (P.y - B.y) < 0) return Dist(P, B);
+	return fabs(cross(P.x - A.x, P.y - A.y, P.x - B.x, P.y - B.y)) / Dist(A, B);
+}
+
+double MinDist() {
+	if (Area(a, n) < 0) reverse(a, a + n);
+	if (Area(b, m) < 0) reverse(b, b + m);
+
+	int p1 = 0, p2 = 0;
+	for (int i = 0; i < n; ++i)
+		if (a[i].x < a[p1].x) p1 = i;
+	for (int i = 0; i < m; ++i)
+		if (b[i].x > b[p2].x) p2 = i;
+
+	int cnt = 0;
+	double ret = dist(a[p1], b[p2]);
+	while (cnt < n) {
+		ret = min(ret, DistP2S(a[p1], b[p2], b[(p2 + 1) % m]));
+		ret = min(ret, DistP2S(a[(p1 + 1) % n], b[p2], b[(p2 + 1) % m]));
+		ret = min(ret, DistP2S(b[p2], a[p1], a[(p1 + 1) % n]));
+		ret = min(ret, DistP2S(b[(p2 + 1) % m], a[p1], a[(p1 + 1) % n]));
+
+		if (cross(a[(p1 + 1) % n].x - a[p1].x, a[(p1 + 1) % n].y - a[p1].y, b[p2].x - b[(p2 + 1) % m].x, b[p2].y - b[(p2 + 1) % m].y) > 0) p1 = (p1 + 1) % n, ++cnt;
+		else p2 = (p2 + 1) % m;
+	}
+
+	return ret;
+}

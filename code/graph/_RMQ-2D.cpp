@@ -1,0 +1,34 @@
+const int maxn = 300 + 10;
+const int maxl = 9; //2^maxl >= maxn
+
+int F[maxl][maxl][maxn][maxn];
+int a[maxn][maxn];
+int lg[maxn];
+int n, m;
+
+void init() {
+	lg[0] = 0;
+	for (int j, i = 1; i < maxn; lg[i++] = j - 1)
+		for (j = 0; (1 << j) <= i; ++j);
+}
+
+void make_RMQ() {
+	for (int i = 0; i < n; ++i)
+		for (int j = 0; j < m; ++j)
+			F[0][0][i][j] = a[i][j];
+
+	for (int i = 0, x = 1; x <= n; ++i, x <<= 1)
+		for (int j = 0, y = 1; y <= m; ++j, y <<= 1) {
+			if (!i && !j) continue;
+			for (int p = 0; p <= n - x; ++p)
+				for (int q = 0; q <= m - y; ++q)
+					if (i) F[i][j][p][q] = min(F[i - 1][j][p][q], F[i - 1][j][p + x / 2][q]);
+					else F[i][j][p][q] = min(F[i][j - 1][p][q], F[i][j - 1][p][q + y / 2]);
+		}
+}
+
+inline int RMQ(int X1, int Y1, int X2, int Y2) {
+	int x = lg[X2 - X1 + 1], y = lg[Y2 - Y1 + 1];
+	return min(min(F[x][y][X1][Y1], F[x][y][X1][Y2 - (1 << y) + 1]),
+		min(F[x][y][X2 - (1 << x) + 1][Y1], F[x][y][X2 - (1 << x) + 1][Y2 - (1 << y) + 1]));
+}

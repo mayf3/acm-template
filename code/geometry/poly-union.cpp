@@ -1,0 +1,59 @@
+int n;
+int v[MAXN]; // the number of vertexes
+point p[MAXN][MAXV];
+pair<double, int> c[MAXN * MAXV * 2];
+double tot[MAXN + 1];
+
+double pos(point p, line ln)
+{
+	return dcmp(ln.second.X - ln.first.X) ?
+	       (p.X - ln.first.X) / (ln.second.X - ln.first.X) :
+	       (p.Y - ln.first.Y) / (ln.second.Y - ln.first.Y);
+}
+
+double area()
+{
+	memset(tot, 0, sizeof(tot));
+	for (int i = 0; i < n; ++i)
+	for (int ii = 0; ii < v[i]; ++ii) {
+		point A = p[i][ii], B = p[i][(ii + 1) % v[i]];
+		line AB = line(A, B);
+		int m = 0;
+		for (int j = 0; j < n; ++j) if (i != j)
+		for (int jj = 0; jj < v[j]; ++jj) {
+			point C = p[j][jj], D = p[j][(jj + 1) % v[j]];
+			line CD = line(C, D);
+			int f1 = dcmp(cross(A, B, C));
+			int f2 = dcmp(cross(A, B, D));
+			if (!f1 && !f2) {
+				if (i < j && dcmp(dot(dir(AB), dir(CD))) > 0) {
+					c[m++] = make_pair(pos(C, AB), 1);
+					c[m++] = make_pair(pos(D, AB), -1);
+				}
+			} else {
+				double s1 = cross(C, D, A);
+				double s2 = cross(C, D, B);
+				double t = s1 / (s1 - s2);
+				if (f1 >= 0 && f2 < 0) c[m++] = make_pair(t, 1);
+				if (f1 < 0 && f2 >= 0) c[m++] = make_pair(t, -1);
+			}
+		}
+		c[m++] = make_pair(0.0, 0);
+		c[m++] = make_pair(1.0, 0);
+		sort(c, c + m);
+		double s = cross(A, B), z = min(max(c[0].first, 0.0), 1.0);
+		for (int j = 1, k = c[0].second; j < m; ++j) {
+			double w = min(max(c[j].first, 0.0), 1.0);
+			tot[k] += s * (w - z);
+			k += c[j].second;
+			z = w;
+		}
+	}
+	return tot[0];
+}
+
+/*
+tot[0] is the aera of union
+tot[n - 1] is the aera of intersection
+tot[k - 1] - tot[k] is the aera of region covered by k times
+*/

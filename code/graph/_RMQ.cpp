@@ -1,0 +1,25 @@
+const int maxn = 100;
+const int maxl = 7; //2^maxl >= maxn
+
+int F[maxl][maxn];
+int a[maxn], lg[maxn];
+int n;
+
+void init() {
+	lg[0] = 0;
+	for (int j, i = 1; i < maxn; lg[i++] = j - 1)
+		for (j = 0; (1 << j) <= i; ++j);
+}
+
+void make_RMQ() {
+	for (int i = 0; i < n; ++i) F[0][i] = a[i];
+
+	for (int i = 1, k = 2; k <= n; ++i, k <<= 1)
+		for (int j = 0; j <= n - k; ++j)
+			F[i][j] = min(F[i - 1][j], F[i - 1][j + k / 2]);
+}
+
+inline int RMQ(int i, int j) {
+	int k = lg[j - i + 1];
+	return min(F[k][i], F[k][j - (1 << k) + 1]);
+}
