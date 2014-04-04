@@ -1,0 +1,104 @@
+\subsubsection{有上下界的最大流}
+
+\begin{verbatim}
+#include <algorithm>
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+using namespace std;
+
+const int INF=0x7FFFFFFF;
+
+const int maxn=1001;
+const int kMaxM=100001;
+
+int n,m,s,t,ca,P,tot,S,T,NT,flow,maxtot;
+int g[maxn],last[maxn],h[maxn],vh[maxn];
+int a[kMaxM][4],f[kMaxM],adj[kMaxM],next[kMaxM];
+
+void insert(int x, int y, int limit){
+    f[tot]=limit;
+    adj[tot]=y;
+    next[tot]=g[x];
+    g[x]=tot++;
+
+    f[tot]=0;
+    adj[tot]=x;
+    next[tot]=g[y];
+    g[y]=tot++;
+}
+
+int dfs(int now, int add){
+    if (now==T) return add;
+    int y, tmp, minh=NT+1, p=last[now];
+    do{
+        y=adj[p];
+        if (f[p]>0 && p<maxtot){
+            if (h[now]==h[y]+1){
+                tmp=dfs(y,min(f[p],add));
+                if (tmp!=0){
+                    f[p]-=tmp;
+                    f[p^1]+=tmp;
+                    last[now]=p;
+                    return tmp;
+                }
+            }
+            minh=min(minh,h[y]+1);
+            if (h[S]>NT) return 0;
+        }
+        p=next[p];
+        if (p==-1) p=g[now];
+    } while (p!=last[now]);
+
+    if (--vh[h[now]]==0) h[S]=NT+1;
+    h[now]=minh; ++vh[minh];
+    return 0;
+}
+
+int getflow(){
+    //a[i][0],a[i][1],a[i][2],a[i][3]表示(a[i][0],a[i][1])
+    //这条边以及下界流量为a[i][2]，上界流量为a[i][3]
+    //tot是边的总数
+    tot=0;
+    memset(g,255,sizeof(g));
+    for (int i=1; i<=m; i++)
+    insert(a[i][0],a[i][1],a[i][3]-a[i][2]);
+    int tmp=tot;
+    //前面tot条边都是上界流量-下界流量
+    //做第二次最大流的时候只能用这tot条边
+    //所以在这里要用tmp纪录tot
+
+    //S和T在第一次网络流中是超级源和超级汇。
+    //对于一条下界边(u,v,lower)，连(u,T,lower)和(S,v,lower)
+    S=n+1; T=S+1;
+    for (int i=1; i<=m; i++)
+    {
+        insert(a[i][0],T,a[i][2]);
+        insert(S,a[i][1],a[i][2]);
+    }
+    //s和t是原图中的源和汇，第一次最大流要连一条(t,s,无穷大)的边
+    insert(t,s,INF);
+
+    memset(h,0,sizeof(h));
+    memset(vh,0,sizeof(vh));
+    for (int i=1; i<=T; i++) last[i]=g[i];
+    //maxtot表示做网络流时所能经过的编号最大的边，NT表示有多少个顶点
+    maxtot=tot; vh[0]=T; flow=0; NT=n+2;
+    while (h[S]<=NT) flow+=dfs(S,INF);
+    //第一次最大流，如果流量不等于所有边的下界总和，则方案不合法
+    if (flow!=m*lower) return -1;
+
+    //第二次最大流在残余图上做
+    //且只能使用前tmp条边，源和汇是原图的源汇
+    //f[tot-1]表示从原图的源流出的流量，加入到最后的流量中
+    S=s; T=t; flow=f[tot-1];
+    memset(h,0,sizeof(h));
+    memset(vh,0,sizeof(vh));
+    for (int i=1; i<=n; i++) last[i]=g[i];
+    //若T比定点个数小，则设NT=n，所有的h[S]<=NT而不是<=T
+    maxtot=tmp; vh[0]=n; NT=n;
+    while (h[S]<=NT) flow+=dfs(S,INF);
+    //flow就是这个有上下界流量的最大流
+    return flow;
+}
+\end{verbatim}

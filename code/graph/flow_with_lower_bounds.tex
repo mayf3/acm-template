@@ -1,0 +1,17 @@
+Graph modification :
+Given graph G, we have to find the flow from node s to t so that:
+F[u][v]: amount of flow passes through edge(u, v).
+F[u][v] must satisfy: D[u][v] <= F[u][v] <= C[u][v].
+
+We add two new nodes s' and t' into the graph and rebuild the graph G to make new graph G':
+Each edge(u, v) in the graph G will correspond to 3 edges in graph G': edge(s', v) with capacity = D[u][v], edge(u,  t') with capacity = D[u][v] and edge(u, v) with capacity = C[u][v] - D[u][v].
+In addition , we add new edge(t, s) with capacity = infinity ( i.e very very big ).
+
+Theorem: There exists the flow in graph G that satisfy D[u][v] <= F[u][v] <= C[u][v] if and only if there exists one flow from s' to t' in graph G' = Sum( D[u][v] ) with edge(u, v) in G .
+
+It's clear that if there exists such flow in graph G' , it must be the maxflow from s' to t'. So we only have to check whether maxflow from s' to t' is equal to Sum ( D[u][v] ) or not.
+If there exists such one, now to define the flow graph in G, we just add D[u][v] into F'[u][v] ( F'[u][v]: amount of flow passes through edge(u,v) in graph G' ) and F[u][v] = F'[u][v] + D[u][v].
+
+Maximum feasible flow: Modify C[v][u] into D[u][v], then use any maxflow algorithm of ZERO lower bounds from S to T to get the Maximum feasible flow.
+
+Minimum feasible flow: Modify C[v][u] into D[u][v], then use any maxflow algorithm of ZERO lower bounds from T to S to get the Minimum feasible flow.
