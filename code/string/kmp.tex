@@ -1,3 +1,5 @@
+\subsubsection{kmp}
+\begin{verbatim}
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
@@ -9,9 +11,7 @@ int next[N];
 
 int kmp(char *s, int n, char *t, int m) {
   int i, j;
-  
   next[0] = -1;
-  
   i = 0; j = -1;
   while (i < m) {
     if (j == -1 || t[i] == t[j]) {
@@ -21,7 +21,6 @@ int kmp(char *s, int n, char *t, int m) {
       j = next[j];
     }
   }
-  
   i = j = 0;
   while (i < n && j < m) {
     if (j == -1 || s[i] == t[j]) {
@@ -32,3 +31,4 @@ int kmp(char *s, int n, char *t, int m) {
   }
   return (j >= m ? i - m : -1);
 }
+\end{verbatim}
