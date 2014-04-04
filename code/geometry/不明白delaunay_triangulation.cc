@@ -205,7 +205,6 @@ point *cycle[MAXN];
 
 void Make_Triangles() {
   tn = 0;
-
   /* first 2 and last 2 are boundary points */
   for (int i = 2; i < N - 2; ++i) {
     cn = 0;
@@ -216,7 +215,6 @@ void Make_Triangles() {
       e = Next(e, u);
     } while (e != u->in);
     cycle[cn] = cycle[0];
-
     for (int j = 0; j < cn; j++) {
       point *x = cycle[j], *y = cycle[j + 1];
       if (u < x && u < y && x - p < N - 2 && y - p < N - 2) {
@@ -232,26 +230,20 @@ int main() {
   scanf("%d", &N);
   for (int i = 0; i < N; ++i)
     scanf("%lf%lf", &p[i].x, &p[i].y);
-
   /* add boundary points, required by Make_Triangles() */
   p[N++] = point(-INF, -INF);
   p[N++] = point(+INF, -INF);
   p[N++] = point(-INF, +INF);
   p[N++] = point(+INF, +INF);
-
   for (int i = 0; i < N; ++i)
     p[i].in = NULL;
-
   sort(p, p + N);
   for (int i = 0; i < N; i++) 
     Q[i] = p + i;
-
   Alloc_memory();
   edge *L, *R;
   Divide(0, N - 1, &L, &R);
-
 //Make_Graph();
   Make_Triangles();
-
   return 0;
 }
