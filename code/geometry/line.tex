@@ -3,10 +3,10 @@
 typedef pair<Point, Point> Line;
 
 bool  inter(Line a, Line b, Point &p){
-	double s1 = cross(a.F, a.S, b.F);
-	double s2 = cross(a.F, a.S, b.S);
-	if (!sign(s1 - s2)) return false;
-	p = (s1 * b.S - s2 * b.F) / (s1 - s2);
-	return true;
+    double s1 = cross(a.F, a.S, b.F);
+    double s2 = cross(a.F, a.S, b.S);
+    if (!sign(s1 - s2)) return false;
+    p = (s1 * b.S - s2 * b.F) / (s1 - s2);
+    return true;
 }
 \end{verbatim}

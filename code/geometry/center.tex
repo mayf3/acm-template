@@ -8,46 +8,46 @@ point ip(line u, line v) {
 }
 
 Line perpendicular(Line l, Point a){
-	return Line(a, Point(a.x + l.p.y - l.q.y, a.y + l.q.x - l.p.x));
+    return Line(a, Point(a.x + l.p.y - l.q.y, a.y + l.q.x - l.p.x));
 }
 
 Point pedal(Line l, Point a){
-	return ip(l, perpendicular(l, a));
+    return ip(l, perpendicular(l, a));
 }
 
 Point mirror(Line l, Point a){
-	Point p = pedal(l, a);
-	return Point(p.x * 2 - a.x, p.y * 2 - a.y);
+    Point p = pedal(l, a);
+    return Point(p.x * 2 - a.x, p.y * 2 - a.y);
 }
 
 //垂心
 Point perpencenter(Point a, Point b, Point c){
-	Line u = perpendicular(Line(b, c), a);
-	Line v = perpendicular(Line(a, c), b);
-	return ip(u, v);
+    Line u = perpendicular(Line(b, c), a);
+    Line v = perpendicular(Line(a, c), b);
+    return ip(u, v);
 }
 
 //内心
 Point icc(Point A, Point B, Point C){
-	double a = dist(B, C);
-	double b = dist(C, A);
-	double c = dist(A, B);
-	double p = (a + b + c) / 2;
-	double s = sqrt(p * (p - a) * (p - b) * (p - c));
-	Point cp;
-	cp.x = (a * A.x + b * B.x + c * C.x) / (a + b + c);
-	cp.y = (a * A.y + b * B.y + c * C.y) / (a + b + c);
-	return cp;
+    double a = dist(B, C);
+    double b = dist(C, A);
+    double c = dist(A, B);
+    double p = (a + b + c) / 2;
+    double s = sqrt(p * (p - a) * (p - b) * (p - c));
+    Point cp;
+    cp.x = (a * A.x + b * B.x + c * C.x) / (a + b + c);
+    cp.y = (a * A.y + b * B.y + c * C.y) / (a + b + c);
+    return cp;
 }
 
 //外心
 Point ccc(Point A, Point B, Point C){
-	double a1 = B.x - A.x, b1 = B.y - A.y, c1 = (Sqr(a1) + Sqr(b1)) / 2;;
-	double a2 = C.x - A.x, b2 = C.y - A.y, c2 = (Sqr(a2) + Sqr(b2)) / 2;;
-	double d = a1 * b2 - a2 * b1;
-	Point cp;
-	cp.x = A.x + (c1 * b2 - c2 * b1) / d;
-	cp.y = A.y + (a1 * c2 - a2 * c1) / d;
-	return cp;
+    double a1 = B.x - A.x, b1 = B.y - A.y, c1 = (Sqr(a1) + Sqr(b1)) / 2;;
+    double a2 = C.x - A.x, b2 = C.y - A.y, c2 = (Sqr(a2) + Sqr(b2)) / 2;;
+    double d = a1 * b2 - a2 * b1;
+    Point cp;
+    cp.x = A.x + (c1 * b2 - c2 * b1) / d;
+    cp.y = A.y + (a1 * c2 - a2 * c1) / d;
+    return cp;
 }
 \end{verbatim}

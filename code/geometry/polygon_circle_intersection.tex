@@ -4,105 +4,105 @@ Point p[3];
 double r;
 
 double cross(Point a, Point b){
-	return a.X * b.Y - a.Y * b.X;
+    return a.X * b.Y - a.Y * b.X;
 }
 
 double cross(Point a, Point b, Point c){
-	return cross(b - a, c - a);
+    return cross(b - a, c - a);
 }
 
 double dot(Point a, Point b){
-	return a.X * b.X + a.Y * b.Y;
+    return a.X * b.X + a.Y * b.Y;
 }
 
 double dot(Point a, Point b, Point c){
-	return dot(b - a, c - a);
+    return dot(b - a, c - a);
 }
 
 double len(Line l){
-	return abs(l.S - l.F);
+    return abs(l.S - l.F);
 }
 
 double dis(Point p, Line l){
-	return fabs(cross(p, l.F, l.S) / len(l));
+    return fabs(cross(p, l.F, l.S) / len(l));
 }
 
 bool inter(Line a, Line b, Point &p){
-	double s1 = cross(a.F, a.S, b.F);
-	double s2 = cross(a.F, a.S, b.S);
-	if (!sign(s1 - s2)) return false;
-	p  = (s1 * b.S - s2 * b.F) / (s1 - s2);
-	return true;
+    double s1 = cross(a.F, a.S, b.F);
+    double s2 = cross(a.F, a.S, b.S);
+    if (!sign(s1 - s2)) return false;
+    p  = (s1 * b.S - s2 * b.F) / (s1 - s2);
+    return true;
 }
 
 Vec dir(Line l){
-	return l.S - l.F;
+    return l.S - l.F;
 }
 
 Vec normal(Vec v){
-	return Vec(-v.Y, v.X);
+    return Vec(-v.Y, v.X);
 }
 
 Vec unit(Vec v){
-	return v / abs(v);
+    return v / abs(v);
 }
 
 bool onseg(Point p, Line l){
-	return sign(cross(p, l.F, l.S)) == 0 && sign(dot(p, l.F, l.S)) <= 0;
+    return sign(cross(p, l.F, l.S)) == 0 && sign(dot(p, l.F, l.S)) <= 0;
 }
 
 double arg(Vec a, Vec b){
-	double d = arg(b) - arg(a);
-	if (d > PI) d -= 2 * PI;
-	if (d < -PI) d += 2 * PI;
-	return d;
+    double d = arg(b) - arg(a);
+    if (d > PI) d -= 2 * PI;
+    if (d < -PI) d += 2 * PI;
+    return d;
 }
 
 double area(Point a, Point b){
-	double s1 = 0.5 * cross(a, b);
-	double s2 = 0.5 * arg(a, b) * r * r;
-	return fabs(s1) < fabs(s2) ? s1 : s2;
+    double s1 = 0.5 * cross(a, b);
+    double s2 = 0.5 * arg(a, b) * r * r;
+    return fabs(s1) < fabs(s2) ? s1 : s2;
 }
 
 double area(){
-	double s = 0;
-	rep(i, n){
-		Point O(0, 0), A = p[i], B = p[(i + 1) % 3];
-		Line AB(A, B);
-		double d = dis(O, AB);
-		if (sign(d - r) >= 0){
-			s += area(A, B);
-		}
-		else{
-			Point P;
-			inter(AB, Line(O, O + normal(dir(AB))), P);
-			Vec v = sqrt(r * r - d * d) * unit(dir(AB));
-			Point P1 = P - v, P2 = P + v;
-			if (!onseg(P1, AB) && !onseg(P2, AB)){
-				s += area(A, B);
-			}
-			else{
-				s += area(A, P1);
-				s += area(P1, P2);
-				s += area(P2, B);
-			}
-		}
-	}
-	return fabs(s);
+    double s = 0;
+    rep(i, n){
+        Point O(0, 0), A = p[i], B = p[(i + 1) % 3];
+        Line AB(A, B);
+        double d = dis(O, AB);
+        if (sign(d - r) >= 0){
+            s += area(A, B);
+        }
+        else{
+            Point P;
+            inter(AB, Line(O, O + normal(dir(AB))), P);
+            Vec v = sqrt(r * r - d * d) * unit(dir(AB));
+            Point P1 = P - v, P2 = P + v;
+            if (!onseg(P1, AB) && !onseg(P2, AB)){
+                s += area(A, B);
+            }
+            else{
+                s += area(A, P1);
+                s += area(P1, P2);
+                s += area(P2, B);
+            }
+        }
+    }
+    return fabs(s);
 }
 
 void init(){
-	scanf("%d%d", &n, &r);
-	rep(i, n){
-		double x, y;
-		scanf("%lf%lf", &x, &y);
-		p[i] = Point(x, y);
-	}
+    scanf("%d%d", &n, &r);
+    rep(i, n){
+        double x, y;
+        scanf("%lf%lf", &x, &y);
+        p[i] = Point(x, y);
+    }
 }
 
 int main(){
-	init();
-	printf("%.12lf\n", area());
-	return 0;
+    init();
+    printf("%.12lf\n", area());
+    return 0;
 }
 \end{verbatim}

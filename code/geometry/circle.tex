@@ -1,90 +1,90 @@
 \subsubsection{圆}
 \begin{verbatim}
 struct Circle{
-	Point o;
-	double r;
-	Circle(Point o = Point(), double r = 1) : o(o), r(r){}
-	Circle(double x, double y, double r = 1) : o(x, y), r(r){}
+    Point o;
+    double r;
+    Circle(Point o = Point(), double r = 1) : o(o), r(r){}
+    Circle(double x, double y, double r = 1) : o(x, y), r(r){}
 };
 
 int intersected_circle_line(Circle c, Line l){
-	return sign(dist_line_point(l, c.o) - c.r) < 0;
+    return sign(dist_line_point(l, c.o) - c.r) < 0;
 }
 
 int ip_circle_line(Circle c, Line l, Point &p1, Point &p2){
-	Point a = l.p, b = l.q;
-	double dx = b.x - a.x;
-	double dy = b.y - a.y;
-	double sdr = Sqr(dx) + Sqr(dy);
-	double dr = sqrt(sdr);
-	double d, disc, x, y;
-	a.x -= c.o.x; a.y -= c.o.y;
-	b.x -= c.o.x; b.y -= c.o.y;
-	d = a.x * b.y - b.x * a.y;
-	disc = Sqr(c.r) * sdr - Sqr(d);
-	if (disc < -EPS) return 0;
-	if (disc < +EPS){
-		disc = 0;
-	}
-	else{
-		disc = sqrt(disc);
-	}
-	x = disc * dx * (dy > 0 ? 1 : -1);
-	y = disc * fabs(dy);
-	p1.x = (+d * dy + x) / sdr + c.o.x;
-	p2.x = (+d * dy - x) / sdr + c.o.x;
-	p1.y = (-d * dx + y) / sdr + c.o.y;
-	p2.y = (-d * dx - y) / sdr + c.o.y;
-	return disc > EPS ? 2 : 1;
+    Point a = l.p, b = l.q;
+    double dx = b.x - a.x;
+    double dy = b.y - a.y;
+    double sdr = Sqr(dx) + Sqr(dy);
+    double dr = sqrt(sdr);
+    double d, disc, x, y;
+    a.x -= c.o.x; a.y -= c.o.y;
+    b.x -= c.o.x; b.y -= c.o.y;
+    d = a.x * b.y - b.x * a.y;
+    disc = Sqr(c.r) * sdr - Sqr(d);
+    if (disc < -EPS) return 0;
+    if (disc < +EPS){
+        disc = 0;
+    }
+    else{
+        disc = sqrt(disc);
+    }
+    x = disc * dx * (dy > 0 ? 1 : -1);
+    y = disc * fabs(dy);
+    p1.x = (+d * dy + x) / sdr + c.o.x;
+    p2.x = (+d * dy - x) / sdr + c.o.x;
+    p1.y = (-d * dx + y) / sdr + c.o.y;
+    p2.y = (-d * dx - y) / sdr + c.o.y;
+    return disc > EPS ? 2 : 1;
 }
 
 int ip_circle_circle(const Circle &c1, const Circle &c2, Point &p1, Point &p2){
-	double mx = c2.o.x - c1.o.x, sx = c2.o.x + c1.o.x, mx2 = Sqr(mx);
-	double my = c2.o.y - c1.o.y, sy = c2.o.y + c1.o.y, my2 = Sqr(my);
-	double sq = mx2 + my2, d = -(sq - Sqr(c1.r - c2.r)) * (sq - Sqr(c1.r + c2.r));
-	if (!sign(sq)) return 0;
-	if (d + EPS < 0) return 0;
-	if (d < EPS){
-		d = 0;
-	}
-	else{
-		d = sqrt(d);
-	}
-	double x = mx * ((c1.r + c2.r) * (c1.r - c2.r) + mx * sx) + sx * my2;
-	double y = my * ((c1.r + c2.r) * (c1.r - c2.r) + my * sy) + sy * mx2;
-	double dx = mx * d, dy = my * d;
-	sq *= 2;
-	p1.x = (x + dy) / sq; p1.y = (y - dx) / sq;
-	p2.x = (x - dy) / sq; p2.y = (y + dy) / sq;
-	return d > EPS ? 2 : 1; 
+    double mx = c2.o.x - c1.o.x, sx = c2.o.x + c1.o.x, mx2 = Sqr(mx);
+    double my = c2.o.y - c1.o.y, sy = c2.o.y + c1.o.y, my2 = Sqr(my);
+    double sq = mx2 + my2, d = -(sq - Sqr(c1.r - c2.r)) * (sq - Sqr(c1.r + c2.r));
+    if (!sign(sq)) return 0;
+    if (d + EPS < 0) return 0;
+    if (d < EPS){
+        d = 0;
+    }
+    else{
+        d = sqrt(d);
+    }
+    double x = mx * ((c1.r + c2.r) * (c1.r - c2.r) + mx * sx) + sx * my2;
+    double y = my * ((c1.r + c2.r) * (c1.r - c2.r) + my * sy) + sy * mx2;
+    double dx = mx * d, dy = my * d;
+    sq *= 2;
+    p1.x = (x + dy) / sq; p1.y = (y - dx) / sq;
+    p2.x = (x - dy) / sq; p2.y = (y + dy) / sq;
+    return d > EPS ? 2 : 1; 
 }
 
 double circle_circle_intersection_area(Circle A, Circle B){
-	double d, dA, dB, tx, ty;
-	d = hypot(B.o.x - A.o.x, B.o.y - A.o.y);
-	if ((d < EPS) || (d + A.r <= B.r) || (d + B.r <= A.r)){
-		return Sqr((B.r < A.r) ? B.r : A.r) * PI;
-	}
-	if (d >= A.r + B.r){
-		return 0;
-	}
-	dA = tx = (Sqr(d) + Sqr(A.r) - Sqr(B.r)) / d / 2;
-	ty = sqrt(Sqr(A.r) - Sqr(tx));
-	dB = d - dA;
-	return Sqr(A.r) * acos(dA / A.r) - dA * sqrt(Sqr(A.r) - Sqr(dA)) + Sqr(B.r) * acos(dB / B.r) - dB * sqrt(Sqr(B.r) - Sqr(dB));
+    double d, dA, dB, tx, ty;
+    d = hypot(B.o.x - A.o.x, B.o.y - A.o.y);
+    if ((d < EPS) || (d + A.r <= B.r) || (d + B.r <= A.r)){
+        return Sqr((B.r < A.r) ? B.r : A.r) * PI;
+    }
+    if (d >= A.r + B.r){
+        return 0;
+    }
+    dA = tx = (Sqr(d) + Sqr(A.r) - Sqr(B.r)) / d / 2;
+    ty = sqrt(Sqr(A.r) - Sqr(tx));
+    dB = d - dA;
+    return Sqr(A.r) * acos(dA / A.r) - dA * sqrt(Sqr(A.r) - Sqr(dA)) + Sqr(B.r) * acos(dB / B.r) - dB * sqrt(Sqr(B.r) - Sqr(dB));
 }
 
 /*
  * return 2 points of tangency of c and p
  */
 void circle_tangents(Circle c, Point p, Point &a, Point &b){
-	double d = Sqr(c.o.x - p.x) + Sqr(c.o.y - p.y);
-	double para = Sqr(c.r) / d;
-	double perp = c.r * sqrt(d - Sqr(c.r)) / d;
-	a.x = c.o.x + (p.x - c.o.x) * para - (p.y - c.o.y) * perp;
-	a.y = c.o.y + (p.y - c.o.y) * para + (p.x - c.o.x) * perp;
-	b.x = c.o.x + (p.x - c.o.x) * para + (p.y - c.o.y) * perp;
-	b.y = c.o.y + (p.y - c.o.y) * para - (p.x - c.o.x) * perp;
+    double d = Sqr(c.o.x - p.x) + Sqr(c.o.y - p.y);
+    double para = Sqr(c.r) / d;
+    double perp = c.r * sqrt(d - Sqr(c.r)) / d;
+    a.x = c.o.x + (p.x - c.o.x) * para - (p.y - c.o.y) * perp;
+    a.y = c.o.y + (p.y - c.o.y) * para + (p.x - c.o.x) * perp;
+    b.x = c.o.x + (p.x - c.o.x) * para + (p.y - c.o.y) * perp;
+    b.y = c.o.y + (p.y - c.o.y) * para - (p.x - c.o.x) * perp;
 }
 
 /*
@@ -93,43 +93,43 @@ void circle_tangents(Circle c, Point p, Point &a, Point &b){
  * -1 : outside circle;
  */
 int on_circle(Circle c, Point a){
-	return sign(c.r - dist(a, c.o));
+    return sign(c.r - dist(a, c.o));
 }
 
 /*
  * minimum circle that covers 2 points
  */
 Circle cc2(Point a, Point b){
-	return Circle(mp(a, b), dist(a, b) / 2);
+    return Circle(mp(a, b), dist(a, b) / 2);
 }
 
 Circle cc3(Point p, Point q, Point r){
-	Circle c;
-	if (on_circle(c = cc2(p, q), r) >= 0) return c;
-	if (on_circle(c = cc2(p, r), q) >= 0) return c;
-	if (on_circle(c = cc2(q, r), p) >= 0) return c;
-	c.o = ccc(p, q, r);
-	c.r = dist(c.o, p);
-	return c;
+    Circle c;
+    if (on_circle(c = cc2(p, q), r) >= 0) return c;
+    if (on_circle(c = cc2(p, r), q) >= 0) return c;
+    if (on_circle(c = cc2(q, r), p) >= 0) return c;
+    c.o = ccc(p, q, r);
+    c.r = dist(c.o, p);
+    return c;
 }
 
 Circle min_circle_cover(Point p[], int n){
-	if (n == 1) return Circle(p[0], 0);
-	if (n == 2) return cc2(p[0], p[1]);
-	random_shuffle(p, p + n);
-	Point *ps[4] = {&p[0], &p[1], &p[2], &p[3]};
-	Circle c = cc3(*ps[0], *ps[1], *ps[2]);
-	while(true){
-		Point *b = p;
-		for(int i = 1; i < n; i++){
-			if (dist(p[i], c.o) > dist(*b, c.o)) b = &p[i];
-		}
-		if (on_circle(c, *b) >= 0) return c;
-		ps[3] = b;
-		for(int i = 0; i < 3; i++){
-			swap(ps[i], ps[3]);
-			if (on_circle(c = cc3(*ps[0], *ps[1], *ps[2]), *ps[3]) >= 0) break;
-		}
-	}
+    if (n == 1) return Circle(p[0], 0);
+    if (n == 2) return cc2(p[0], p[1]);
+    random_shuffle(p, p + n);
+    Point *ps[4] = {&p[0], &p[1], &p[2], &p[3]};
+    Circle c = cc3(*ps[0], *ps[1], *ps[2]);
+    while(true){
+        Point *b = p;
+        for(int i = 1; i < n; i++){
+            if (dist(p[i], c.o) > dist(*b, c.o)) b = &p[i];
+        }
+        if (on_circle(c, *b) >= 0) return c;
+        ps[3] = b;
+        for(int i = 0; i < 3; i++){
+            swap(ps[i], ps[3]);
+            if (on_circle(c = cc3(*ps[0], *ps[1], *ps[2]), *ps[3]) >= 0) break;
+        }
+    }
 }
 \end{verbatim}
