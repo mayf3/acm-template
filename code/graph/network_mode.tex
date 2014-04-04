@@ -1,0 +1,13 @@
+\subsubsection{网络流模型}
+1、\textbf{最大权闭合图}：定义一个有向图$G=(V,E)$的闭合图是该有向图的一个点集，且该点集的所有出边都还指向该点集。即闭合图内的任一点的任意后继也一定在闭合图中。更形式化地说，闭合图是这样一个点集$V' \in V$，满足对于$\forall u \in V'$引出的$\forall \langle u,v \rangle \in E$，必有$v \in V'$成立。还有一种等价定义为：满足对于$\forall \langle u,v \rangle \in E$，若有$u \in V'$成立，必有$v \in V'$成立。闭合图允许超过一个连通块。\par
+给每个点$v$分配一个点权$w_v$（任意实数，可正可负）。最大权闭合图，是一个点权之和最大的闭合图，即最大化$\sum_{v \in V'}w_v$。\par
+在许多实际应用中，给出的有向图常常是一个有向无环图（DAG），闭合图的性质恰好反映了事件间的\textbf{必要条件}的关系：一个时间的发生，它所需要的所有前提也要发生。\par
+\textbf{最大权闭合图转化成最小割模型}：在原图点集的基础上增加源$s$和汇$t$；将原图每条有向边$\langle u,v \rangle \in E$替换为容量为$c(u,v)=+\infty$的有向边$\langle u,v \rangle \in E_N$；增加连接源$s$到原图每个\textbf{正权点}$v(w_v>0)$的有向边$\langle s,v \rangle \in E_N$，容量为$c(s,v)=w_v$；增加连接原图的每个\textbf{负权点}$v(w_v<0)$到汇$t$的有向边$\langle v,t \rangle \in E_N$，容量为$c(v,t)=-w_v$。其中，正无限$\infty$定义为任意一个大于$\sum_{v\in V}|w_v|$的整数。
+
+~\\
+~\\ \par
+2、\textbf{最大密度子图}：定义一个无向图$G=(V,E)$的密度$D$为该图的边数$|E|$与该图的点数$|V|$的比值$D=\frac{|E|}{|V|}$。给出一个无向图$G=(V,E)$，其具有最大密度的子图$G'=(V',E')$称为\textbf{最大密度子图}，即最大化$D'=\frac{|E'|}{|V'|}$。\par
+\textbf{性质}：无向图中，任意两个具有不同密度的子图$G_1,G_2$，它们的密度差不小于$\frac{1}{n^2}$。\par
+\textbf{构图}：在原图点集$V$的基础上增加源$s$和汇$t$；将每条原无向边$(u,v)$替换为两条容量为1的有向边$\langle v,u \rangle$和$\langle u,v \rangle$；增加连接源$s$到原图每个点$v$的有向边$\langle s,v \rangle$，容量为$U$；增加连接原图每个点$v$到汇$t$的有向边$\langle v,t \rangle$，容量为$(U+2g-d_v)$。其中$U$是图总的边数，$g$是二分的答案，$d_v$表示顶点$v$的度。
+
+

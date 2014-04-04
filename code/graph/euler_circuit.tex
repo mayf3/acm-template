@@ -1,0 +1,143 @@
+\subsection{混合图欧拉回路}
+
+\begin{verbatim}
+#include<iostream>
+#include<cstdio>
+#include<algorithm>
+#include<cstring>
+#include<ctime>
+using namespace std;
+
+const int INF=0x7FFFFFFF;
+const int maxn=5000;
+int n,m,num,s,t,all,correct,flow;
+int a[maxn][3],adj[maxn],next[maxn],vt[maxn],h[maxn];
+int vh[maxn],st[maxn],f[maxn],sum[maxn],sign[maxn][2],fa[maxn];
+
+int maxflow(int x, int ff)
+{
+  if (x==t) return ff;
+
+  int minh=t-s+2;
+
+  for (int i=1; i<=sum[x]; i++){
+    if (f[st[x]]>0){
+    //因为欧拉回路中两点之间可能有多条连边，用邻接矩阵可能会出现问题
+      if (h[x]==h[adj[st[x]]]+1){
+        int k=maxflow(adj[st[x]],min(ff,f[st[x]]));
+        if (k>0){
+          f[st[x]]-=k;
+          f[st[x]^1]+=k;
+          return k;
+        }
+      }
+      minh=min(minh,h[adj[st[x]]]+1);
+      if (h[s]>t-s+1) return 0;
+    }
+    st[x]=next[st[x]];
+    if (st[x]==0) st[x]=vt[x];
+  }
+
+  --vh[h[x]];
+  if (vh[h[x]]==0) h[s]=t-s+2;
+  h[x]=minh;
+  ++vh[h[x]];
+
+  return 0;
+}
+void connect(int x,int y)
+{
+  ++all;
+  ++sum[x];
+  adj[all]=y;
+  next[all]=vt[x];
+  vt[x]=all;
+}
+int ask(int x)
+{
+  if (fa[x]==x) return x;
+  fa[x]=ask(fa[x]);
+  return fa[x];
+}
+void solve()
+{
+  for (int i=2; i<=n; i++)
+    if (ask(i)!=ask(i-1)){
+      printf("impossible\n");
+      return;
+    }
+    //并查集判断图的联通性
+
+  s=0; t=n+1; correct=0; flow=0;
+
+  for (int i=1; i<=n; i++)
+    if ((abs(sign[i][0]-sign[i][1])%2)==1){
+      printf("impossible\n");
+      return;
+    } else if (sign[i][0]>sign[i][1]){
+      connect(s,i);
+      f[all]=(sign[i][0]-sign[i][1])/2;
+      connect(i,s);
+      //将入度大于出度的点连到起点s
+      correct+=(sign[i][0]-sign[i][1])/2;
+    } else if (sign[i][1]>sign[i][0]){
+      connect(i,t);
+      f[all]=(sign[i][1]-sign[i][0])/2;
+      connect(t,i);
+      //将出度大于入度的点连接到汇点t
+    }
+
+  for (int i=s; i<=t; i++) st[i]=vt[i];
+
+  memset(h,0,sizeof(h));
+  memset(vh,0,sizeof(vh));
+  vh[0]=t-s+1;
+
+  while (h[s]<=t-s+1) flow+=maxflow(s,INF);
+
+  if (flow==correct) printf("possible\n"); else printf("impossible\n");
+  //满流时成立
+}
+void prepare()
+{
+  all=1;
+  memset(sum,0,sizeof(sum));
+  memset(vt,0,sizeof(vt));
+  memset(sign,0,sizeof(sign));
+  memset(f,0,sizeof(f));
+  for (int i=1; i<=n; i++) fa[i]=i;
+}
+void init()
+{
+  scanf("%d",&num);
+  while (num--){
+    scanf("%d%d",&n,&m);
+
+    prepare();
+    for (int i=1; i<=m; i++){
+      scanf("%d%d%d",&a[i][0],&a[i][1],&a[i][2]);
+      if (a[i][2]==0){
+        if ((rand()%2)==0) swap(a[i][0],a[i][1]);
+        //随机双向边的方向
+        connect(a[i][0],a[i][1]);
+        f[all]=1;
+        //构图时只连接双向边，流的方向为随机后的方向
+        connect(a[i][1],a[i][0]);
+      }
+      ++sign[a[i][0]][0]; ++sign[a[i][1]][1];
+      int x=ask(a[i][0]), y=ask(a[i][1]);
+      fa[x]=fa[y];
+    }
+    solve();
+  }
+}
+int main()
+{
+  srand(time(0));
+  init();
+  return 0;
+}
+
+//pku 1637
+
+\end{verbatim} 
