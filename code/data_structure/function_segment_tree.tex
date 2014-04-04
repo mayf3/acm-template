@@ -1,0 +1,149 @@
+\subsubsection{可持久化线段树}
+持久化数据结构最重要的思想是无论询问还是插入操作，都不修改原来的数据，而是新建立节点。
+~\\
+~\\
+\Large{题目描述} \par
+\small
+1. C l r d: Adding a constant d for every $A_i(l\leq i\leq r)$, and increase the time $t$ add by 1, this is the only operation that will cause the time increase. \par
+2. Q l r: Querying the current sum of $A_i(l \leq i \leq r)$. \par
+3. H l r t: Querying a history sum of $A_i(l \leq i\leq r)$ in time $t$. \par
+4. B t: Back to time $t$. And once you decide return to a past, you can never be access to a forward edition anymore.\par
+~\\
+\Large{程序} \par
+\small
+\begin{verbatim}
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+const int kMaxN=100001;
+const int MAXLIMIT=500000;
+
+struct data{
+    long long add;
+    long long sum;
+    data *lt,*rt;
+    data(){}
+    data(data *lt, data *rt, long long sum, int add=0):lt(lt),rt(rt),sum(sum),add(add){}
+    inline long long getSum(int len){
+        if (!this) return 0;
+        return sum+add*len;
+    }
+};
+
+data buffer[MAXLIMIT];
+data* tree[kMaxN];
+int n,m,total,number;
+int record[kMaxN];
+
+data *build(int l, int r){
+    if (l==r){
+        scanf("%d",&number);
+        data *node=&buffer[total++];
+        node->lt=node->rt=NULL;
+        node->sum=number; node->add=0; 
+        return node;
+    }
+
+    int mid=(l+r)/2;
+    data *node=&buffer[total++];
+    node->lt=build(l,mid);
+    node->rt=build(mid+1,r);
+    node->sum=node->lt->getSum(mid-l+1)+
+        node->rt->getSum(r-mid);
+
+    node->add=0;
+    return node;
+}
+
+data *insert(int l, int r, data *node, int L, int R, long long Add, int add){
+    if (L>r || l>R){
+        if (Add!=0){
+            buffer[total]=data(*node);
+            buffer[total].add+=Add;
+            return &buffer[total++];
+        }
+        return node;
+    }
+    if (L<=l && r<=R){
+        buffer[total]=data(*node);
+        buffer[total].add+=Add+add;
+        return &buffer[total++];
+    }
+
+    int mid=(l+r)/2;
+    data *lt=insert(l,mid,node->lt,L,R,
+        Add+node->add,add);
+
+    data *rt=insert(mid+1,r,node->rt,L,R,
+        Add+node->add,add);
+
+    long long sum=lt->getSum(mid-l+1)+
+        rt->getSum(r-mid);
+
+    buffer[total++]=data(lt,rt,sum,0);
+    return &buffer[total-1];
+}
+
+long long ask(int l, int r, data *node, int L, int R, long long Add){
+    if (L>r || l>R) return 0;
+    if (L<=l && r<=R){
+        return node->getSum(r-l+1)+Add*(r-l+1);
+    }
+
+    int mid=(l+r)/2;
+    long long lt=ask(l,mid,node->lt,L,R,
+        Add+node->add);
+
+    long long rt=ask(mid+1,r,node->rt,L,R,
+        Add+node->add);
+
+    return lt+rt;
+}
+
+
+void init(){
+    total=0;
+    tree[0]=build(1,n);
+}
+
+void solve(){
+    char opt[2];
+    int L,R,add;
+    int cur=0,Time;
+    record[cur]=total;
+    for (int i=0; i<m; i++){
+        scanf("%s",opt);
+        if (opt[0]=='C'){
+            scanf("%d%d%d",&L,&R,&add);
+            tree[cur+1]=insert(1,n,tree[cur],L,R,0,add);
+            record[++cur]=total;
+        } else
+        if (opt[0]=='H'){
+            scanf("%d%d%d",&L,&R,&Time);
+            long long temp=ask(1,n,tree[Time],L,R,0);
+            printf("%I64d\n",temp);
+        } else
+        if (opt[0]=='Q'){
+            scanf("%d%d",&L,&R);
+            long long temp=ask(1,n,tree[cur],L,R,0);
+            printf("%I64d\n",temp);
+        } else{
+            scanf("%d",&cur);
+            total=record[cur];
+        }
+    }
+}
+
+int main(){
+    while (scanf("%d%d",&n,&m)!=EOF){
+        init();
+        solve();
+    }
+    return 0;
+}
+\end{verbatim}
