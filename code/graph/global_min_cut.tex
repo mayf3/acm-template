@@ -1,3 +1,5 @@
+\subsubsection{Dijkstra最短路}
+\begin{verbatim}
 const int MAXN = 50 + 10; //number of vertices
 const int MAXM = 500; //number of MinCut edges
 const int INF = 1000000000; //max capacity
@@ -31,7 +33,6 @@ int find(int x) {
 int stoer_wagner() {
 	memcpy(a, map, sizeof(map));
 	for (int i = 0; i < N; ++i) q[i] = root[i] = i;
-
 	int ret = INF;
 	for (int i = 0; i < N - 1; ++i) {
 		int t = mincut(N - i);
@@ -41,31 +42,26 @@ int stoer_wagner() {
 			if (j != s && j != t) a[q[t]][q[j]] = (a[q[j]][q[t]] += a[q[j]][q[s]]);
 		root[find(q[s])] = find(q[t]); q[s] = q[N - i - 1]; 
 	}
-
 	return ret;
 }
 
 void cal(int ans) {
 	memcpy(a, map, sizeof(map));
 	for (int i = 0; i < N; ++i) q[i] = root[i] = i;
-
 	int t;
 	for (int i = 0; i < N - 2; ++i) {
 		t = mincut(N - i - 1);
-
 		if (w[t] == ans) break;
-
 		int s = pre[t];
 		for (int j = 0; j < N - i - 1; ++j)
 			if (j != s && j != t) a[q[t]][q[j]] = (a[q[j]][q[t]] += a[q[j]][q[s]]);
 		root[find(q[s])] = find(q[t]); q[s] = q[N - i - 2]; 
 	}
-
 	t = find(q[t]);
-
 	M = 0; //number of MinCut edges
 	for (int i = 0; i < N; ++i)
 		if (find(root[i]) == t)
 			for (int j = 0; j < N; ++j)
 				if (find(root[j]) != t && idx[i][j]) list[M++] = idx[i][j];
 }
+\end{verbatim}
