@@ -1,0 +1,37 @@
+\subsubsection{Point}
+\begin{verbatim}
+const double EPS = 1E-8;
+const double INF = 1E10;
+const double PI = acos(-1.0);
+
+typedef complex<double> Point;
+
+double cross(Point a, Point b){
+	return a.X * b.Y - a.Y * b.X;
+}
+
+double cross(Point a, Point b, Point c){
+	return cross(b - a, c - a);
+}
+
+double dot(Point a, Point b){
+	return a.X * b.X + a.Y * b.Y;
+}
+
+double dot(Point a, Point b, Point c){
+	return dot(b - a, c - a);
+}
+
+double dist(Point a, Point b){
+	return abs(a - b);
+}
+
+Point rotate(Point v, double alpha){
+	double c = cos(alpha), s = sin(alpha);
+	return Point(v.X * c - v.Y * s, v.X * s + v.Y * c);
+}
+
+double angle(Point a, Point b){
+	return arg(b - a);
+}
+\end{verbatim}

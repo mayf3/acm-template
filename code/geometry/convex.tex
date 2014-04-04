@@ -1,0 +1,88 @@
+\subsubsection{凸包}
+\begin{verbatim}
+// find the convex hull
+Point __o;
+
+bool cmp_p(Point a, Point b){
+	int f = sign(a.X - b.X);
+	if (f) return f < 0;
+	return sign(a.Y - b.Y) < 0;
+}
+
+bool cmp(Point a, Point b){
+	int f = sign(cross(o, a, b));
+	if (f) return f > 0;
+	return sign(abs(a - o) - abs(b - o)) < 0;
+}
+
+Point stack[1111]
+
+int find_convex(Point p[], int n){
+	__o = *min_element(p, p + n, cmp_p);
+	sort(p, p + n, cmp);
+	int top = 0;
+	rep(i, n){
+		while(top >= 2 && sign(cross(stack[top - 2], stack[top - 1], p[i])) <= 0) top--;
+		stack[top++] = p[i];
+	}
+	rep(i, top) p[i] = stack[i];
+	return top;
+}
+
+// -----intersection points convex hull--------
+bool lcmp(Line u, Line v){
+	int c = sign((u.p.x - u.q.x) * (v.p.y - v.q.y) - (v.p.x - v.q.x) * (u.p.y - u.q.y));
+	return c < 0 || !c && sign(cross(u.p, u.q, v.p)) < 0;
+}
+
+/*
+ * XXX sizeof(p) MUST be as large as n * 2
+ * return # of points of resulting convex hull
+ */
+int ip_convex(Line l[], int n, Point p[]){
+	for(int i = 0; i < n; i++){
+		if (l[i].q < l[i].p) swap(l[i].p, l[i].q);
+	}
+	sort(l, l + n, lcmp);
+	int n1 = 0;
+	for(int i = 0, j = 0; i < n; i = j){
+		while(j < n && parallel(l[i], l[j])) j++;
+		if (j - i == 1){
+			l[n1++] = l[i];
+		}
+		else{
+			l[n1++] = l[i];
+			l[n1++] = l[j - 1];
+		}
+	}
+	n = n1;
+	l[n + 0] = l[0];
+	l[n + 1] = l[1];
+	int m = 0;
+	for(int i = 0, j = 0; i < n; i++){
+		while(j < n + 2 && parallel(l[i], l[j])) j++;
+		for(int k = j; k < n + 2 && parallel(l[j], l[k]);k++){
+			p[m++] = ip(l[i], l[k]);
+		}
+	}
+	return find_convex(p, m);
+}
+
+typedef double Tdata;
+typedef Point Tpoint;
+// get the diameter of convex polygon
+// O(N)
+// p1, p2 are the points forming diameter
+Tdata diam_convex_poly(Tpoint *P, int N, Tpoint &p1, Tpoint &p2) {
+	if (N == 1) {
+		p1 = p2 = P[0];
+		return 0;
+	}
+	double ret = -INF;
+	for (int j = 1, i = 0; i < N; ++i) {
+		while (sign(cross(P[i], P[i + 1], P[j + 1]) - cross(P[i], P[i + 1], P[j])) > 0) j = (j + 1) % N;
+		ret = max(ret, max(dist2(P[i], P[j]), dist2(P[i + 1], P[j + 1])));
+	}
+	return ret;
+}
+\end{verbatim}
