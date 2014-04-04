@@ -22,7 +22,6 @@ void init(int n) {
 
 int jump(int v, int d) {
   int i;
-  
   for (i = 0; d; i++) {
     if (d & 1) v = pnt[v][i];
     d >>= 1;
@@ -32,12 +31,9 @@ int jump(int v, int d) {
 
 int lca(int u, int v) {
   int i, d, x, y;
-  
   if (h[u] > h[v]) swap(u, v);
-
   v = jump(v, h[v] - h[u]);
   if (u == v) return v;
-
   for (i = dmax; i >= 0; i--) {
     x = pnt[u][i];
     y = pnt[v][i];
@@ -46,13 +42,11 @@ int lca(int u, int v) {
       v = y;
     }
   }
-
   return pnt[u][0];
 }
 
 int main() {
   int n, i, j, k, u, v, w, z, p, m;
-
   while (scanf("%d", &n), n) {
     init(n);
     for (i = 1; i < n; i++) {
@@ -60,7 +54,6 @@ int main() {
       add(u, v, w);
       add(v, u, w);
     }
-
     memset(pnt, -1, sizeof(pnt));
     memset(h, -1, sizeof(h));
     dist[0] = h[0] = s = t = 0;
@@ -81,7 +74,6 @@ int main() {
         }
       }
     }
-
     dmax = 0;
     for (j = 1; (1 << j) < n; j++) {
       for (i = 0; i < n; i++) {
@@ -91,7 +83,6 @@ int main() {
       }
       if (dmax < j) break;
     }
-
     scanf("%d", &m);
     while (m--) {
       scanf("%d %d", &u, &v);
@@ -100,7 +91,5 @@ int main() {
     }
     puts("");
   }
-
   return 0;
 }
-

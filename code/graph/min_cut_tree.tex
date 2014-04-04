@@ -1,4 +1,4 @@
-\subsubsection{Dijkstra最短路}
+\subsubsection{最小割树}
 \begin{verbatim}
 #include <cstdio>
 #include <cstring>
@@ -11,7 +11,7 @@ const int maxm = maxn * maxn;
 const int INF = 100000000;
 
 struct Tedge {
-	int v, f, c, next;
+    int v, f, c, next;
 };
 
 
@@ -21,92 +21,89 @@ int a[maxn][maxn], cut[maxn][maxn];
 int n, m, S, T;
 
 inline void add_edge(int u, int v, int c1, int c2 = 0) {
-	edge[m].v = v; edge[m].f = 0; edge[m].c = c1; edge[m].next = first[u]; first[u] = m++;
-	edge[m].v = u; edge[m].f = 0; edge[m].c = c2; edge[m].next = first[v]; first[v] = m++;
+    edge[m].v = v; edge[m].f = 0; edge[m].c = c1; edge[m].next = first[u]; first[u] = m++;
+    edge[m].v = u; edge[m].f = 0; edge[m].c = c2; edge[m].next = first[v]; first[v] = m++;
 }
 
 bool newphase() {
-	for (int i = 0; i < n; ++i) level[i] = n, nedge[i] = first[i];
-	queue[0] = S; level[S] = 0;
-	for (int h = 0, t = 1; h < t; ++h) {
-		int u = queue[h];
-		for (int i = first[u]; i != -1; i = edge[i].next)
-			if (edge[i].f < edge[i].c && level[edge[i].v] == n) {
-				level[edge[i].v] = level[u] + 1;
-				if (edge[i].v == T) return 1;
-				queue[t++] = edge[i].v;
-			}
-	}
-	return 0;
+    for (int i = 0; i < n; ++i) level[i] = n, nedge[i] = first[i];
+    queue[0] = S; level[S] = 0;
+    for (int h = 0, t = 1; h < t; ++h) {
+        int u = queue[h];
+        for (int i = first[u]; i != -1; i = edge[i].next)
+            if (edge[i].f < edge[i].c && level[edge[i].v] == n) {
+                level[edge[i].v] = level[u] + 1;
+                if (edge[i].v == T) return 1;
+                queue[t++] = edge[i].v;
+            }
+    }
+    return 0;
 }
 
 bool find_path(int u) {
-	for (int i = nedge[u]; i != -1; i = edge[i].next)
-		if (edge[i].f < edge[i].c && level[edge[i].v] == level[u] + 1)
-			if (edge[i].v == T || find_path(edge[i].v)) {
-				pedge[edge[i].v] = nedge[u] = i;
-				return 1;
-			}
-	nedge[u] = -1;
-	return 0;
+    for (int i = nedge[u]; i != -1; i = edge[i].next)
+        if (edge[i].f < edge[i].c && level[edge[i].v] == level[u] + 1)
+            if (edge[i].v == T || find_path(edge[i].v)) {
+                pedge[edge[i].v] = nedge[u] = i;
+                return 1;
+            }
+    nedge[u] = -1;
+    return 0;
 }
 
 int Dinic() {
-	for (int i = 0; i < m; ++i) edge[i].f = 0;
-	int ret = 0;
-	while (newphase())
-		while (find_path(S)) {
-			int delta = INF;
-			for (int u = T, i = pedge[u]; u != S; u = edge[i ^ 1].v, i = pedge[u])
-				delta = min(delta, edge[i].c - edge[i].f);
-			for (int u = T, i = pedge[u]; u != S; u = edge[i ^ 1].v, i = pedge[u])
-				edge[i].f += delta, edge[i ^ 1].f -= delta;
-			ret += delta;
-		}
-	return ret;
+    for (int i = 0; i < m; ++i) edge[i].f = 0;
+    int ret = 0;
+    while (newphase())
+        while (find_path(S)) {
+            int delta = INF;
+            for (int u = T, i = pedge[u]; u != S; u = edge[i ^ 1].v, i = pedge[u])
+                delta = min(delta, edge[i].c - edge[i].f);
+            for (int u = T, i = pedge[u]; u != S; u = edge[i ^ 1].v, i = pedge[u])
+                edge[i].f += delta, edge[i ^ 1].f -= delta;
+            ret += delta;
+        }
+    return ret;
 }
 
 int main() {
-	int N;
-	scanf("%d", &N);
-	for (int tst = 1; tst <= N; ++tst) {
-		m = 0;
-		memset(first, -1, sizeof(first));
-		scanf("%d", &n);
-		for (int i = 0; i < n; ++i)
-			for (int j = 0; j < n; ++j) {
-				scanf("%d", &a[i][j]);
-				if (i < j && a[i][j]) add_edge(i, j, a[i][j], a[i][j]);
-			}
-
-		memset(cut, 0, sizeof(cut));
-		memset(par, 0, sizeof(par));
-		for (S = 1; S < n; ++S) {
-			T = par[S];
-			fl[S] = cut[S][T] = cut[T][S] = Dinic();
-			for (int i = 1; i < n; ++i)
-				if (i != S && level[i] != n && par[i] == T) par[i] = S;
-			if (level[par[T]] != n) {
-				par[S] = par[T];
-				par[T] = S;
-				fl[S] = fl[T];
-				fl[T] = cut[S][T];
-			}
-			for (int i = 0; i < S; ++i)
-				if (i != T) cut[S][i] = cut[i][S] = min(cut[S][T], cut[T][i]);
-		}
-		// (i, par[i]) of value fl[i][par[i]] are the edges of GH cut tree
-
-		printf("Case #%d:\n", tst);
-		for (int i = 0; i < n; ++i) {
-			for (int j = 0; j < n; ++j) {
-				if (j) printf(" ");
-				printf("%d", cut[i][j]);
-			}
-			printf("\n");
-		}
-	}
-
-	return 0;
+    int N;
+    scanf("%d", &N);
+    for (int tst = 1; tst <= N; ++tst) {
+        m = 0;
+        memset(first, -1, sizeof(first));
+        scanf("%d", &n);
+        for (int i = 0; i < n; ++i)
+            for (int j = 0; j < n; ++j) {
+                scanf("%d", &a[i][j]);
+                if (i < j && a[i][j]) add_edge(i, j, a[i][j], a[i][j]);
+            }
+        memset(cut, 0, sizeof(cut));
+        memset(par, 0, sizeof(par));
+        for (S = 1; S < n; ++S) {
+            T = par[S];
+            fl[S] = cut[S][T] = cut[T][S] = Dinic();
+            for (int i = 1; i < n; ++i)
+                if (i != S && level[i] != n && par[i] == T) par[i] = S;
+            if (level[par[T]] != n) {
+                par[S] = par[T];
+                par[T] = S;
+                fl[S] = fl[T];
+                fl[T] = cut[S][T];
+            }
+            for (int i = 0; i < S; ++i)
+                if (i != T) cut[S][i] = cut[i][S] = min(cut[S][T], cut[T][i]);
+        }
+        // (i, par[i]) of value fl[i][par[i]] are the edges of GH cut tree
+        printf("Case #%d:\n", tst);
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (j) printf(" ");
+                printf("%d", cut[i][j]);
+            }
+            printf("\n");
+        }
+    }
+    return 0;
 }
 \end{verbatim}
