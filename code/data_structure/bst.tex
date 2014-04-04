@@ -1,0 +1,97 @@
+\subsubsection{BST}
+\begin{verbatim}
+\*
+BST和Treap基本一样，Treap是用Max-heap作为平衡条件，BST用子树节点个数作为平衡条件
+一般情况下BST比Treap稍微平衡一点
+*\
+#include <cstdio>
+#include <algorithm>
+const int INF=0x7FFFFFFF;
+const int kMaxN=1000001;
+
+int n,total,head;
+int key[kMaxN],size[kMaxN],le[kMaxN],ri[kMaxN];
+
+void init(){
+    scanf("%d\n",&n);
+}
+
+void RightRotate(int &head){
+    int tmp=le[head];
+    le[head]=ri[tmp];
+    ri[tmp]=head;
+    size[tmp]=size[head];
+    size[head]=size[le[head]]+size[ri[head]]+1;
+    head=tmp;
+}
+
+void LeftRotate(int &head){
+    int tmp=ri[head];
+    ri[head]=le[tmp];
+    le[tmp]=head;
+    size[tmp]=size[head];
+    size[head]=size[le[head]]+size[ri[head]]+1;
+    head=tmp;
+}
+
+void insert(int &head, int number){
+    if (head==0){
+        ++total;
+        key[total]=number;
+        size[total]=1;
+        le[total]=ri[total]=0;
+        head=total;
+    } else{
+        ++size[head];
+        if (key[head]>number){
+            insert(le[head],number);
+            if (size[le[le[head]]]>size[ri[head]] || size[ri[le[head]]]>size[ri[head]])
+                RightRotate(head);
+        } else{
+            insert(ri[head],number);
+            if (size[le[ri[head]]]>size[le[head]] || size[ri[ri[head]]]>size[le[head]])
+                LeftRotate(head);
+        }
+    }
+}
+
+void del(int &head, int number){
+    --size[head];
+    if (key[head]>number) del(le[head],number); else
+    if (key[head]<number) del(ri[head],number); else{
+        if (size[head]==0){
+            head=0;
+            return;
+        }
+        if (size[le[head]]>size[ri[head]]){
+            RightRotate(head);
+            del(ri[head],number);
+        } else{
+            LeftRotate(head);
+            del(le[head],number);
+        }
+    }
+}
+
+void solve(){
+    char ch;
+    int number;
+    head=total=0;
+    for (int i=0; i<n; i++){
+        scanf("%c %d\n",&ch,&number);
+        if (ch=='i'){
+            insert(head,number);
+        } else
+        if (ch=='d'){
+            del(head,number);
+        }
+    }
+    printf("%d\n",size[head]);
+}
+
+int main(){
+    init();
+    solve();
+    return 0;
+}
+\end{verbatim}
