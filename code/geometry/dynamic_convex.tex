@@ -1,3 +1,5 @@
+\subsubsection{动态凸包}
+\begin{verbatim}
 //By Lin
 #include<cstdio>
 #include<cstring>
@@ -13,12 +15,12 @@ typedef pair<int,int> pii;
 map<int,int> up[2];
 map<int,int>::iterator iter,p,q;
 
-int        strcmp( pii a, pii b, pii c){
-    LL    ret = ((LL)b.X-a.X)*((LL)c.Y-a.Y)-((LL)b.Y-a.Y)*((LL)c.X-a.X);
+int strcmp( pii a, pii b, pii c){
+    LL ret = ((LL)b.X-a.X)*((LL)c.Y-a.Y)-((LL)b.Y-a.Y)*((LL)c.X-a.X);
     return ret>0?1:(ret==0?0:-1);
 }
 
-bool    pan( map<int,int> &g ,int x,int y){
+bool pan( map<int,int> &g ,int x,int y){
     if ( g.size() == 0 ) return false;
     if ( g.find(x) != g.end() ) return y>=g[x];
     if ( g.begin()->X > x || (--g.end())->X < x ) return false;
@@ -28,7 +30,7 @@ bool    pan( map<int,int> &g ,int x,int y){
     return strcmp(*p,*q,mp(x,y))>=0;
 }
 
-void    insert( map<int,int> &g, int x,int y){
+void insert( map<int,int> &g, int x,int y){
     if ( pan(g,x,y) ) return;
     g[x] = y;
     iter = g.find(x);
@@ -53,7 +55,8 @@ void    insert( map<int,int> &g, int x,int y){
         else break;
     }
 }
-int        main(){
+
+int main(){
     int cas;
     scanf("%d", &cas );
     while ( cas -- ){
@@ -67,3 +70,4 @@ int        main(){
     }
     return 0;
 }
+\end{verbatim}

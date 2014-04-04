@@ -127,17 +127,14 @@ void convexIntersection() {
 void calcArea() {
 	static Point ps[MAX_N_BORDER];
 	int cnt = 0;
-
 	if (qt - qh <= 2) {
 		puts("0.0");
 		return;
 	}
-
 	for (int i = qh; i < qt; ++i) {
 		int next = i + 1 == qt ? qh : i + 1;
 		ps[cnt++] = isBorder(que[i], que[next]);
 	}
-
 	long double area = 0;
 	for (int i = 0; i < cnt; ++i) {
 		area += ps[i].det(ps[(i + 1) % cnt]);
@@ -158,7 +155,6 @@ int main() {
 	add(LARGE, 0, LARGE, LARGE);
 	add(LARGE, LARGE, 0, LARGE);
 	add(0, LARGE, 0, 0);
-
 	convexIntersection();
 	calcArea();
 }
