@@ -5,7 +5,6 @@
 #include <cmath>
 
 #define Sqr(x) (x) * (x)
-#define sign(x) ((x < -EPS) ? -1 : x > EPS)
 
 using namespace std;
 
@@ -13,58 +12,133 @@ const double EPS = 1E-8;
 const double INF = 1E+9;
 const double PI = acos(-1.0);
 
-typedef complex<double> Point;
-
-bool operator<(const Point &a, const Point &b){
-	int f = sign(a.X - b.X);
-	if (f) return f < 0;
-	return sign(a.Y - b.Y) < 0;
+inline int sign(double x){
+	return x < -EPS ? -1 : x > EPS;
 }
 
-double cross(Point a, Point b){
-	return a.X * b.Y - a.Y * b.X;
+/*
+ * Point 
+ */
+struct Point{
+	double x, y;
+	Point(double x = 0, double y = 0) : x(x), y(y){}
+	bool operator<(const Point &p) const{
+		return sign(x - p.x) * 2 + sign(y - p.y) < 0;
+	}
+	bool operator==(const Point &p) const {
+		return sign(x - p.x) == 0 && sign(y - p.y) == 0;
+	}
+};
+
+void read(Point *p){
+	scanf("%lf%lf", &p->x, &p->y);
+}
+
+void print(Point &p){
+	printf("%.3lf %.3lf\n", p.x, p.y);
+}
+
+Point operator+(Point a, Point b){
+	return Point(a.x + b.x, a.y + b.y);
+}
+
+Point operator-(Point a, Point b){
+	return Point(a.x - b.x, a.y - b.y);
 }
 
 double cross(Point a, Point b, Point c){
-	return cross(b - a, c - a);
-}
-
-double dot(Point a, Point b){
-	return a.X * b.X + a.Y * b.Y;
-}
-
-double dot(Point a, Point b, Point c){
-	return dot(b - a, c - a);
+	return (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
 }
 
 double dist(Point a, Point b){
-	return abs(a - b);
+	return hypot(a.x - b.x, a.y - b.y);
 }
 
-Point rotate(Point v, double alpha){
-	double c = cos(alpha), s = sin(alpha);
-	return Point(v.X * c - v.Y * s, v.X * s + v.Y * c);
+/*
+ * mid point
+ */
+Point mp(Point a, Point b){
+	return Point((a.x + b.x) / 2, (a.y + b.y) / 2);
 }
 
-double fix(double a, double b = 0) {
-  a -= b;
-  if (sign(a) < 0) a += 2 * pi;
-  if (sign(a - 2 * pi) >= 0) a -= 2 * pi;
-  return a;
+/*
+ * next point
+ */
+Point np(Point a, double alpha, double d){
+	return Point(a.x + d * cos(alpha), a.y + d * sin(alpha));
+}
+
+/*
+ * PA * PB
+ */
+double dot(Point p, Point a, Point b){
+	return (a.x - p.x) * (b.x - p.x) + (a.y - p.y) * (b.y - p.y);
+}
+
+/*
+ * delta angle of ABC
+ */
+inline double delta_angle(Point a, Point b, Point c){
+	return acos(dot(b, a, c) / (dist(a, b) * dist(b, c)));
+}
+
+/*
+ * if ABC a sharp triangle
+ */
+int sharp(Point a, Point b, Point c){
+	return sign(dot(a, b, c)) > 0 && sign(dot(b, a, c)) > 0 && sign(dot(c, a, b)) > 0;
+}
+
+double fix(double a, double b = 0){
+	a -= b;
+	if (sign(a) < 0) a += 2 * PI;
+	if (sign(a - 2 * PI) >= 0) a -= 2 * PI;
+	return a;
 }
 
 double angle(Point a, Point b){
-	return fix(arg(b - a));
+	return fix(atan2(b.y - a.y, b.x - a.x));
+}
+
+Point rotate(Point a, Point b, double alpha){
+	double s, c, x, y;
+	a.x -= b.x;
+	a.y -= b.y;
+	c = cos(alpha);
+	s = sin(alpha);
+	x = a.x * c - a.y * s;
+	y = a.x * s + a.y * c;
+	a.x = x + b.x;
+	a.y = y + b.y;
+	return a;
+}
+
+double area_heron(double a, double b, double c){
+	double s = (a + b + c) / 2.0;
+	if (sign(a - s) >= 0 || sign(b - s) >= 0 || sign(c - s) >= 0) return -1;
+	return sqrt(s * (s - a) * (s - b) * (s - c));
+}
+
+double area_triangle(Point a, Point b, Point c){
+	return fabs(a.x * b.y + b.x * c.y + c.x * a.y - a.x * c.y - b.x * a.y - c.x * b.y) / 2;
+}
+
+double area_polygon(Point a[], int n){
+	double area = 0;
+	for(int j = 0, i = n - 1; j < n; i = j++){
+		area += a[i].x * a[j].y - a[i].y * a[j].x;
+	}
+	return fabs(area) / 2;
 }
 
 Point centroid(Point a[], int n){
 	double area = 0;
-	Point c = Point(0, 0);
-	a[n] = a[0];
+	Point c;
 	for(int i = 0; i < n; i++){
-		area += cross(a[i], a[i + 1]);
-		c.x += (a[i].X + a[i + 1].X) * cross(a[i], a[i + 1]);
-		c.y += (a[i].Y + a[i + 1].Y) * cross(a[i], a[i + 1]);
+		int j = (i + 1) % n;
+		area += a[i].x * a[j].y - a[i].y * a[j].x;
+		c.x += (a[i].x + a[j].x) * (a[i].x * a[j].y - a[i].y * a[j].x);
+		c.y += (a[i].y + a[j].y) * (a[i].x * a[j].y - a[i].y * a[j].x);
 	}
 	area = fabs(area) / 2;
 	c.x /= 6 * area;
@@ -78,32 +152,26 @@ Point centroid(Point a[], int n){
 
 Point __o;
 
-bool cmp_p(Point a, Point b){
-	int f = sign(a.X - b.X);
-	if (f) return f < 0;
-	return sign(a.Y - b.Y) < 0;
-}
-
-bool cmp(Point a, Point b){
-	int f = sign(cross(o, a, b));
-	if (f) return f > 0;
-	return sign(abs(a - o) - abs(b - o)) < 0;
+bool acmp(Point a, Point b){
+	int c = sign(cross(__o, a, b));
+	return c > 0 || !c && dist(a, __o) < dist(b, __o);
 }
 
 /*
  * find convex hull of p[n] in place
  * return # of points of resulting convex hull
  */
-Point stack[1111]
 int find_convex(Point p[], int n){
-	__o = *min_element(p, p + n, cmp_p);
-	sort(p, p + n, cmp);
+	__o = *min_element(p, p + n);
+	sort(p, p + n, acmp);
 	int top = 0;
-	rep(i, n){
+	Point *stack = new Point[n]; //XXX new here!
+	for(int i = 0; i < n; i++){
 		while(top >= 2 && sign(cross(stack[top - 2], stack[top - 1], p[i])) <= 0) top--;
 		stack[top++] = p[i];
 	}
-	rep(i, top) p[i] = stack[i];
+	copy(stack, stack + top, p);
+	free(stack);
 	return top;
 }
 
@@ -128,10 +196,10 @@ void rotate_calipers(Point ps[], int n, double &area, double &peri){
 	Point *q[4] = {NULL, NULL, NULL, NULL};
 	for(int i = 0; i < n; i++){
 		Point *p = &ps[i];
-		if (!q[0] || q[0]->Y > p->Y || q[0]->Y == p->Y && q[0]->X > p->X) q[0] = p;
-		if (!q[1] || q[1]->X < p->X || q[1]->X == p->X && q[1]->Y > p->Y) q[1] = p;
-		if (!q[2] || q[2]->Y < p->Y || q[2]->Y == p->Y && q[2]->X < p->X) q[2] = p;
-		if (!q[3] || q[3]->X > p->X || q[3]->X == p->X && q[3]->Y < p->Y) q[3] = p;
+		if (!q[0] || q[0]->y > p->y || q[0]->y == p->y && q[0]->x > p->x) q[0] = p;
+		if (!q[1] || q[1]->x < p->x || q[1]->x == p->x && q[1]->y > p->y) q[1] = p;
+		if (!q[2] || q[2]->y < p->y || q[2]->y == p->y && q[2]->x < p->x) q[2] = p;
+		if (!q[3] || q[3]->x > p->x || q[3]->x == p->x && q[3]->y < p->y) q[3] = p;
 	}
 	double alpha = 0;
 	for(int k = 0; k < n + 5; k++){
@@ -156,10 +224,14 @@ void rotate_calipers(Point ps[], int n, double &area, double &peri){
 /*
  * lines
  */
-typedef pair<Point, Point> Line;
+struct Line{
+	Point p, q;
+	Line(){}
+	Line(Point p, Point q) : p(p), q(q) {}
+};
 
-int parallel(Line a, Line b){
-	return !sign(cross(a.Y - a.X, b.Y - b.X));
+int parallel(Line u, Line v){
+	return !sign((u.p.x - u.q.x) * (v.p.y - v.q.y) - (v.p.x - v.q.x) * (u.p.y - u.q.y));
 }
 
 /*
@@ -168,7 +240,7 @@ int parallel(Line a, Line b){
  * other wise : -1
  */
 int side(Line m, Point p, Point q){
-	return sign(cross(m.X, m.Y, p)) * sign(cross(m.X, m.Y, q));
+	return sign(cross(m.p, m.q, p)) * sign(cross(m.p, m.q, q));
 }
 
 int on_line(Line l, Point p){
@@ -179,21 +251,21 @@ int on_line(Line l, Point p){
  * u, v : line
  */
 int coinside(Line u, Line v){
-	return on_line(u, v.X) && on_line(u, v.Y);
+	return on_line(u, v.p) && on_line(u, v.q);
 }
 
 /*
  * u, v : line segment, inclusive
  */
 int intersected(Line u, Line v){
-	return !parallel(u, v) && side(u, v.X, v.Y) <= 0 && side(v, u.X, u.Y) <= 0;
+	return !parallel(u, v) && side(u, v.p, v.q) <= 0 && side(v, u.p, u.q) <= 0;
 }
 
 /*
  * u, v : line segment , exclusive
  */
 int intersected_exclusive(Line u, Line v){
-	return !parallel(u, v) && side(u, v.X, v.Y) < 0 && side(v, u.X, u.Y) < 0;
+	return !parallel(u, v) && side(u, v.p, v.q) < 0 && side(v, u.p, u.q) < 0;
 }
 
 /*
@@ -205,14 +277,6 @@ Point ip(Line u, Line v){
 	double d = (u.q.x - u.p.x) * (v.q.y - v.p.y) - (u.q.y - u.p.y) * (v.q.x - v.p.x);
 	double r = n / d;
 	return Point(u.p.x + r * (u.q.x - u.p.x), u.p.y + r * (u.q.y - u.p.y));
-}
-
-bool  inter(Line a, Line b, Point &p){
-	double s1 = cross(a.F, a.S, b.F);
-	double s2 = cross(a.F, a.S, b.S);
-	if (!sign(s1 - s2)) return false;
-	p = (s1 * b.S - s2 * b.F) / (s1 - s2);
-	return true;
 }
 
 /*
