@@ -1,3 +1,5 @@
+\subsubsection{Point}
+\begin{verbatim}
 //By myf
 //#pragma comment(linker, "/STACK:16777216")  //C++
 #include <iomanip>
@@ -73,14 +75,14 @@ void query(int cur, kd p, LL &ret, int d) {
     if (!cur) return;
     ret = min(ret, dis2(t[cur],p));
     T dx = p.x[d] - t[cur].x[d];
-	if (++d == K) d = 0;
-	if (dx < 0) {
-	    query(l[cur],p,ret,d);
-		if (ret > Sqr(dx)) query(r[cur],p,ret,d);
-	} else {
-	    query(r[cur],p,ret,d);
-		if (ret > Sqr(dx)) query(l[cur],p,ret,d);
-	}
+    if (++d == K) d = 0;
+    if (dx < 0) {
+        query(l[cur],p,ret,d);
+        if (ret > Sqr(dx)) query(r[cur],p,ret,d);
+    } else {
+        query(r[cur],p,ret,d);
+        if (ret > Sqr(dx)) query(l[cur],p,ret,d);
+    }
 }
 
 void work() {
@@ -107,3 +109,4 @@ int main() {
     }
     return 0;
 }
+\end{verbatim}
