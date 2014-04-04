@@ -1,3 +1,6 @@
 My acm template
 ---
 ---
+1.先将cpp整理成tex，应付了校赛再说
+2.主目录建立三个文件夹：(1)code只放置cpp；（2)tex_code放置code内cpp切换成tex之后的文件；（3)doc单纯放置文本文件，代表各种理论结论和经典模型
+3.建立脚本，方便添加代码，设想是能一个命令add cpp之后选择放置位置，之后codelibrary.tex会添加代码，同时tex_code内也会添加修改后的tex文件
