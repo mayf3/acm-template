@@ -7,15 +7,15 @@ const double PI = acos(-1.0);
 const double EPS = 1E-6;
 
 struct Matrix{
-	int n, m;
-	double v[N][N];
-	Matrix(){
-		n = m = 4;
-		rep(i, 4) rep(j, 4) v[i][j] = (i == j);
-	}
-	Matrix(int n, int m) : n(n), m(m){
-		rep(i, n) rep(j, m) v[i][j] = 0;
-	}
+    int n, m;
+    double v[N][N];
+    Matrix(){
+        n = m = 4;
+        rep(i, 4) rep(j, 4) v[i][j] = (i == j);
+    }
+    Matrix(int n, int m) : n(n), m(m){
+        rep(i, n) rep(j, m) v[i][j] = 0;
+    }
 };
 
 int n;
@@ -23,115 +23,115 @@ Matrix ret;
 char s[11];
 
 Matrix operator * (Matrix a, Matrix b){
-	Matrix c(a.n, b.m);
-	rep(i, c.n){
-		rep(j, c.m){
-			rep(k, a.m){
-				c.v[i][j] += a.v[i][k] * b.v[k][j];
-			}
-		}
-	}
-	return c;
+    Matrix c(a.n, b.m);
+    rep(i, c.n){
+        rep(j, c.m){
+            rep(k, a.m){
+                c.v[i][j] += a.v[i][k] * b.v[k][j];
+            }
+        }
+    }
+    return c;
 }
 
 Matrix translate(){
-	Matrix ret;
-	double x;
-	rep(i, 3){
-		scanf("%lf", &x);
-		ret.v[i][3] += x;
-	}
-	return ret;
+    Matrix ret;
+    double x;
+    rep(i, 3){
+        scanf("%lf", &x);
+        ret.v[i][3] += x;
+    }
+    return ret;
 }
 
 Matrix scale(){
-	Matrix ret;
-	double x;
-	rep(i, 3){
-		scanf("%lf", &x);
-		ret.v[i][i] *= x;
-	}
-	return ret;
+    Matrix ret;
+    double x;
+    rep(i, 3){
+        scanf("%lf", &x);
+        ret.v[i][i] *= x;
+    }
+    return ret;
 }
 
 Matrix rotate(){
-	Matrix ret;
-	double x, y, z, d;
-	scanf("%lf%lf%lf%lf", &x, &y, &z, &d);
-	double len = sqrt(Sqr(x) + Sqr(y) + Sqr(z));
-	x /= len; y /= len; z /= len;
-	d = d * PI / 180.0;
-	ret.v[0][0] = (1 - cos(d)) * x * x + cos(d);
-	ret.v[0][1] = (1 - cos(d)) * x * y - sin(d) * z;
-	ret.v[0][2] = (1 - cos(d)) * x * z + sin(d) * y;
+    Matrix ret;
+    double x, y, z, d;
+    scanf("%lf%lf%lf%lf", &x, &y, &z, &d);
+    double len = sqrt(Sqr(x) + Sqr(y) + Sqr(z));
+    x /= len; y /= len; z /= len;
+    d = d * PI / 180.0;
+    ret.v[0][0] = (1 - cos(d)) * x * x + cos(d);
+    ret.v[0][1] = (1 - cos(d)) * x * y - sin(d) * z;
+    ret.v[0][2] = (1 - cos(d)) * x * z + sin(d) * y;
 
-	ret.v[1][0] = (1 - cos(d)) * y * x + sin(d) * z;
-	ret.v[1][1] = (1 - cos(d)) * y * y + cos(d);
-	ret.v[1][2] = (1 - cos(d)) * y * z - sin(d) * x;
+    ret.v[1][0] = (1 - cos(d)) * y * x + sin(d) * z;
+    ret.v[1][1] = (1 - cos(d)) * y * y + cos(d);
+    ret.v[1][2] = (1 - cos(d)) * y * z - sin(d) * x;
 
-	ret.v[2][0] = (1 - cos(d)) * z * x - sin(d) * y;
-	ret.v[2][1] = (1 - cos(d)) * z * y + sin(d) * x;
-	ret.v[2][2] = (1 - cos(d)) * z * z + cos(d);
+    ret.v[2][0] = (1 - cos(d)) * z * x - sin(d) * y;
+    ret.v[2][1] = (1 - cos(d)) * z * y + sin(d) * x;
+    ret.v[2][2] = (1 - cos(d)) * z * z + cos(d);
 
-	return ret;
+    return ret;
 }
 
 Matrix pow(Matrix now, int n){
-	Matrix ret;
-	while(n){
-		if (n & 1) ret = now * ret;
-		now = now * now;
-		n >>= 1;
-	}
-	return ret;
+    Matrix ret;
+    while(n){
+        if (n & 1) ret = now * ret;
+        now = now * now;
+        n >>= 1;
+    }
+    return ret;
 }
 
 Matrix dfs(int lev){
-	Matrix now, tmp;
-	while(true){
-		scanf("%s", s);
-		if (s[1] == 'r'){ // translate
-			tmp = translate();
-		}
-		else if (s[1] == 'c'){ // scale
-			tmp = scale();
-		}
-		else if (s[1] == 'o'){ // rotate
-			tmp = rotate();
-		}
-		else if (s[1] == 'e'){ // repeat
-			int k;
-			scanf("%d", &k);
-			tmp = dfs(lev + 1);
-			tmp = pow(tmp, k);
-		}
-		else if (s[1] == 'n'){ // end
-			break;
-		}
-		now = tmp * now;
-	}
-	return now;
+    Matrix now, tmp;
+    while(true){
+        scanf("%s", s);
+        if (s[1] == 'r'){ // translate
+            tmp = translate();
+        }
+        else if (s[1] == 'c'){ // scale
+            tmp = scale();
+        }
+        else if (s[1] == 'o'){ // rotate
+            tmp = rotate();
+        }
+        else if (s[1] == 'e'){ // repeat
+            int k;
+            scanf("%d", &k);
+            tmp = dfs(lev + 1);
+            tmp = pow(tmp, k);
+        }
+        else if (s[1] == 'n'){ // end
+            break;
+        }
+        now = tmp * now;
+    }
+    return now;
 }
 
 void solve(){
-	Matrix now;
-	rep(i, n){
-		now.n = 4, now.m = 1;
-		rep(j, 3) scanf("%lf", &now.v[j][0]);
-		now.v[3][0] = 1;
-		now = ret * now;
-		rep(i, 3) if (fabs(now.v[i][0]) < EPS) now.v[i][0] = 0;
-		printf("%.2f %.2f %.2f\n", now.v[0][0], now.v[1][0], now.v[2][0]);
-	}
+    Matrix now;
+    rep(i, n){
+        now.n = 4, now.m = 1;
+        rep(j, 3) scanf("%lf", &now.v[j][0]);
+        now.v[3][0] = 1;
+        now = ret * now;
+        rep(i, 3) if (fabs(now.v[i][0]) < EPS) now.v[i][0] = 0;
+        printf("%.2f %.2f %.2f\n", now.v[0][0], now.v[1][0], now.v[2][0]);
+    }
 }
 
 int main(){
-	while(~scanf("%d", &n)){
-		if (!n) break;
-		ret = dfs(0);
-		solve();
-		puts("");
-	}
-	return 0;
+    while(~scanf("%d", &n)){
+        if (!n) break;
+        ret = dfs(0);
+        solve();
+        puts("");
+    }
+    return 0;
 }
 \end{verbatim}

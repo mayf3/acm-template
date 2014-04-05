@@ -23,7 +23,6 @@ void init(int r, int c) {
   next = nodes;
   memset(row, 0, sizeof row);
   memset(size, 0, sizeof size);
-
   root = next++;
   root->l = root->r = root;
   for (int y = 0; y < c; y++) {
@@ -39,10 +38,8 @@ void init(int r, int c) {
 /* MUST add from top to bottom, from left to right */
 node *add(int x, int y) {
   node *p = next++;
-
   p->x = x, p->y = y;
   size[y]++;
-
   if (!row[x]) {
     row[x] = p->l = p->r = p;
   } else {
@@ -50,11 +47,9 @@ node *add(int x, int y) {
     p->l = row[x]->l;
     p->r->l = p->l->r = p;
   }
-
   p->d = col[y];
   p->u = col[y]->u;
   p->u->d = p->d->u = p;
-
   return p;
 }
 
@@ -76,7 +71,6 @@ void uncover(node *x) {
 int h() {
   int res = 0;
   node *x, *y, *z;
-
   memset(mark, 0, sizeof mark);
   for (x = root->l; x != root; x = x->l) if (!mark[x->y]) {
     mark[x->y] = 1;
@@ -90,27 +84,20 @@ int h() {
 
 int dfs(int dep) {
   node *x, *y, *z = NULL;
-
   if (dep < h()) return 0;
-
   for (x = root->r; x != root; x = x->r)
     if (!z || size[x->y] < size[z->y]) z = x;
   if (!z) return 1;
-
   if (!dep) return 0;
-
   for (x = z->u; x != z; x = x->u) {
     cover(x);
     for (y = x->r; y != x; y = y->r)
       cover(y);
-
     if (dfs(dep - 1)) return 1;
-
     for (y = x->l; y != x; y = y->l)
       uncover(y);
     uncover(x);
   }
-
   return 0;
 }
 \end{verbatim}

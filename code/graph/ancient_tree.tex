@@ -1,0 +1,85 @@
+\subsubsection{祖先树}
+\begin{verbatim}
+#include <vector>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+using namespace std;
+
+const int kMaxN=100001;
+const int maxDeep=17;
+
+
+/*
+ * The ancestor-tree can use to calc LCA with O(logN) Complexity
+ * also maintain some information from node i to i's ancestor
+ * deep[node] is the distance from root to node
+ * father[node][i] is the 2^i ancestor of node
+*/
+
+int n,m;
+int deep[kMaxN],father[kMaxN][maxDeep];
+vector<int> g[kMaxN];
+
+void init(){
+    scanf("%d",&n);
+    memset(g,0,sizeof(g));
+    int x,y;
+    for (int i=0; i<n-1; i++){
+        scanf("%d%d",&x,&y);
+        g[x].push_back(y);
+        g[y].push_back(x);
+    }
+}
+
+void dfs(int node, int fa){
+    //update father[node][] use the information calc before
+    for (int i=1; i<maxDeep; i++) 
+        father[node][i]=father[father[node][i-1]][i-1];
+
+    for (int i=0; i<g[node].size(); i++)
+        if (g[node][i]!=fa){
+            deep[g[node][i]]=deep[node]+1;
+            father[g[node][i]][0]=node;
+            dfs(g[node][i],node);
+        }
+}
+
+int LCA(int x, int y){
+    //choose the farther one from root and jump up until x,y has 
+    //the same distance from root.
+    if (deep[x]<deep[y]) swap(x,y);
+    int delta=deep[x]-deep[y];
+    for (int i=0; i<maxDeep; i++)
+        if (delta & (1<<i)) x=father[x][i];
+
+    //when the x's,y's (2^i)-th father is different,both of them
+    //should jump up for 2^i step
+    for (int i=maxDeep-1; i>=0; i--)
+        if (father[x][i]!=father[y][i]){
+            x=father[x][i],y=father[y][i];
+        }
+
+    //there are two situtation at last
+    return x!=y?father[x][0]:x;
+}
+
+void solve(){
+    memset(father,0,sizeof(father));
+    deep[1]=0;
+    dfs(1,0);
+
+    scanf("%d",&m);
+    int x,y;
+    for (int i=0; i<m; i++){
+        scanf("%d%d",&x,&y);
+        printf("%d\n",LCA(x,y));
+    }
+}
+
+int main(){
+    init();
+    solve();
+    return 0;
+}
+\end{verbatim}
