@@ -1,0 +1,165 @@
+\subsubsection{线性}
+\begin{verbatim}
+/*
+ maximize
+            c1 * x1 + c2 * x2 + ... + cn * xn
+ subject to
+            a1,1 * x1 + a1,2 * x2 + ... + a1,n * xn <= b1
+                                    .
+                                    .
+                                    .
+            am,1 * x1 + am,2 * x2 + ... + am,n * xn <= bm
+
+ 1. minimize the object function: ci ==> -ci;
+ 2. exist ai(x1, x2, ..., xn) = bi: ai(x1, x2, ..., xn) = bi ==> ai(x1, x2, ..., xn) <= bi & ai(x1, x2, ..., xn) >= bi;
+ 3. exist ai(x1, x2, ..., xn) >= bi: ai(x1, x2, ..., xn) >= bi ==> -ai(x1, x2, ..., xn) <= -bi;
+ 4. exist xi which don't have the limition of xi >= 0: change xi into (xi1 - xi2), add xi1 >= 0, xi2 >= 0.
+*/
+
+const double EPS = 1E-10;
+const int MAXSIZE = 2000; //m + n
+const int INF = 1000000000;
+
+class LinearProgramming {
+    double A[MAXSIZE + 1][MAXSIZE + 1];
+    double b[MAXSIZE + 1], c[MAXSIZE + 1];
+    double origC[MAXSIZE + 1];
+    bool inB[MAXSIZE + 1];
+    int N[MAXSIZE + 1 + 1], B[MAXSIZE + 1 + 1];
+    int n, m;
+    double v;
+
+    void read() {
+        scanf("%d%d", &n, &m);
+        for (int i = 1; i <= n; ++i) scanf("%lf", &c[i]);
+        for (int i = 1; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) scanf("%lf", &A[n + i][j]);
+            scanf("%lf", &b[n + i]);
+        }
+    }
+
+    void pivot(int l, int e)     {    
+        double key = A[l][e];
+        b[e] = b[l] / key;
+        for (int i = 1; i <= N[0]; ++i)
+            if (N[i] != e) A[e][N[i]] = A[l][N[i]] / key;
+        A[e][l] = 1.0 / key;
+
+        for (int i = 1; i <= B[0]; ++i) {
+            if (B[i] == l) continue;
+            double tmp = A[B[i]][e];
+            b[B[i]] = b[B[i]] - A[B[i]][e] * b[e];
+            for(int j = 1; j <= N[0]; ++j)
+                if (N[j] != e) A[B[i]][N[j]] = A[B[i]][N[j]] - A[e][N[j]] * tmp;
+            A[B[i]][l] = -tmp * A[e][l];
+        }
+
+        v += b[e] * c[e];
+        for (int i = 1; i <= N[0]; ++i)
+            if (N[i] != e) c[N[i]] = c[N[i]] - A[e][N[i]] * c[e];
+        c[l] = -A[e][l] * c[e];
+
+        for (int i = 1; i <= N[0]; ++i)
+            if (N[i] == e) N[i] = l;
+        for (int i = 1; i <= B[0]; ++i)
+            if (B[i] == l) B[i] = e;
+    }
+
+    //false stands for unbounded
+    bool opt() {
+        while (1) {
+            int l, e;
+            double maxUp = -1; //不能是0！
+            for (int ie = 1; ie <= N[0]; ++ie) {
+                int te = N[ie];
+                if (c[te] <= EPS) continue;
+                double delta = INF;
+                int tl = MAXSIZE + 1;
+                for (int i = 1; i <= B[0]; ++i)
+                    if (A[B[i]][te] > EPS) {
+                        double temp = b[B[i]] / A[B[i]][te];
+                        if (delta == INF || temp < delta || temp == delta && B[i] < tl) {
+                            delta = temp;
+                            tl = B[i];
+                        }
+                    }
+                if (tl == MAXSIZE + 1) return 0;
+                if (delta * c[te] > maxUp) {
+                    maxUp = delta * c[te];
+                    l = tl; e = te;
+                }
+            }
+            if (maxUp == -1) break;
+            pivot(l, e);
+        }
+        return 1;
+    }
+
+    void delete0() {
+        int p = 1;
+        while (p <= B[0] && B[p]) ++p;
+        if (p <= B[0]) {
+            int i = 1;
+            while (i <= N[0] && fabs(A[0][N[i]]) < EPS) ++i;
+            pivot(0, N[i]);
+        }
+        p = 1;
+        while (p <= N[0] && N[p]) ++p;
+        for (int i = p; i < N[0]; ++i) N[i] = N[i + 1];
+        --N[0];
+    }
+
+    bool initialize() {
+        N[0] = B[0] = 0;
+        for (int i = 1; i <= n; ++i) N[++N[0]] = i;
+        for (int i = 1; i <= m; ++i) B[++B[0]] = n + i;
+        v = 0;
+
+        int l = B[1];
+        for (int i = 2; i <= B[0]; ++i)
+            if (b[B[i]] < b[l]) l = B[i];
+        if (b[l] >= 0) return 1;
+
+        memcpy(origC, c, sizeof(double) * (n + m + 1));
+        N[++N[0]] = 0;
+        for (int i = 1; i <= B[0]; ++i) A[B[i]][0] = -1;
+        memset(c, 0, sizeof(double) * (n + m + 1));
+        c[0] = -1;
+        pivot(l, 0);
+        opt();
+        if (v < -EPS) return 0;
+        delete0();
+
+        memcpy(c, origC, sizeof(double) * (n + m + 1));
+        memset(inB, 0, sizeof(bool) * (n + m + 1));
+        for (int i = 1; i <= B[0]; ++i) inB[B[i]] = 1;
+        for (int i = 1; i <= n + m; ++i)
+            if (inB[i] && c[i] != 0) {
+                v += c[i] * b[i];
+                for (int j = 1; j <= N[0]; ++j) c[N[j]] -= A[i][N[j]] * c[i];
+                c[i] = 0;
+            }
+        return 1;
+    }
+
+    public: void simplex() {
+        read();
+        if (!initialize()) {
+            printf("Infeasible\n");
+            return;
+        }
+        if (!opt()) {
+            printf("Unbounded\n");
+            return;
+        }
+        else printf("Max value is %lf\n", v);
+        
+        bool inN[MAXSIZE + 1];
+        memset(inN, 0, sizeof(bool) * (n + m + 1));
+        for (int i = 1; i <= N[0]; ++i) inN[N[i]] = 1;
+        for (int i = 1; i <= n; ++i)
+            if (inN[i]) printf("x%d = %lf\n", i, 0.0);
+            else printf("x%d = %lf\n", i, b[i]);
+    }
+};
+\end{verbatim}

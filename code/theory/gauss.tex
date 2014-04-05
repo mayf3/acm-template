@@ -1,0 +1,21 @@
+\subsubsection{高斯消元}
+\begin{verbatim}
+//在异或方程里，要求最小改变次数，那就从后往前面枚举，先枚举只有变量之后，前面的变量就确定了
+void gauss(double p[M][M]){
+    static double *b[M];
+    rep(i, M) b[i] = tmp[i];
+    rep(i, M){
+        REP(j, i, M){
+            if (sign(fabs(b[j][i]) - fabs(b[i][i])) > 0) swap(b[i], b[j]);
+        }
+        rep(j, M){
+            if (i == j) continue;
+            double rate = b[j][i] / b[i][i];
+            rep(k, M + M) b[j][k] -= b[i][k] * rate;
+        }
+        double rate = b[i][i];
+        rep(j, M + M) b[i][j] /= rate;
+    }
+    rep(i, M) rep(j, M) p[i][j] = b[i][j + M];
+}
+\end{verbatim}

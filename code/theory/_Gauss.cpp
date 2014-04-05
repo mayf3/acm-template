@@ -12,19 +12,14 @@ void gauss() {
 		int curr = R;
 		while (curr < M && !e[curr][i]) ++curr;
 		if (curr >= M) continue;
-
 		f[i] = 0;
-
 		for (int j = 0; j <= N; ++j) swap(e[curr][j], e[R][j]);
-
 		for (int j = R + 1; j < M; ++j)
 			if (e[j][i]) for (int k = i; k <= N; ++k) e[j][k] ^= e[R][k];
 		++R;
 	}
-
 	for (int i = R; i < M; ++i)
 		if (e[i][N]) return; //no answer
-
 	memset(ans, 0, sizeof(ans));
 	for (int k = R - 1, i = N - 1; i >= 0; --i)
 		if (!f[i]) {
