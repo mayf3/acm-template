@@ -9,7 +9,6 @@ typedef long long ll;
 
 ll modular_multiply(ll x, ll y, ll m) {
   if (x < y) swap(x, y);
-
   ll r = 0;
   while (y) {
     if (y & 0x1)
@@ -34,7 +33,6 @@ ll modular_power(ll x, ll y, ll m) {
 int miller_rabin(ll n, int k = 10) {
   if (n <= 3)
     return n > 1;
-
   while (k--) {
     ll a = rand() % (n - 3) + 2;
     if (modular_power(a, n - 1, n) != 1)
@@ -54,7 +52,6 @@ ll f(ll x, ll m, ll c) {
 ll pollard_rho(ll n) {
   if (!(n & 1))
     return 2;
-
   while (1) {
     ll x = rand() % n;
     ll y = x;
@@ -85,11 +82,9 @@ void find_divisors(ll n, vector<ll> &divisors) {
   vector<ll> factors;
   factorize(n, factors);
   sort(factors.begin(), factors.end());
-  
   divisors.clear(); divisors.push_back(1);
   for (int i = 0, j = 0; i < factors.size(); i = j) {
     while (j < factors.size() && factors[i] == factors[j]) j++;
-
     ll p = factors[i];
     int k = j - i;
     int o = divisors.size();

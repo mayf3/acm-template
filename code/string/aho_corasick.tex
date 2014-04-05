@@ -1,0 +1,55 @@
+\subsubsection{ac自动机}
+\begin{verbatim}
+int root, idx;
+struct trie_node{
+    int next[size];
+    int fail;
+    bool flag;
+    void init(){
+        fail = -1, flag = false;
+        memset(next, 0, sizeof(next));
+    }
+}trie[maxn * leng];
+int q[maxn * leng];
+void trie_init(){
+    root = idx = 0;
+    trie[root].init();
+}
+void insert(char *s){
+    int i, j, p = root;
+    for(i=0;s[i];i++){
+        j = s[i] - 'A';
+        if(!trie[p].next[j]){
+            trie[++idx].init();
+            trie[p].next[j] = idx;
+        }
+        p = trie[p].next[j];
+    }
+    trie[p].flag = true;
+}
+void build(){
+    int j, p;
+    q[0] = root;
+    for(int l=0,h=1;l<h;){
+        p = q[l++];
+        for(j=0;j<size;j++){
+            if(trie[p].next[j]){
+                q[h++] = trie[p].next[j];
+                if(trie[p].fail == -1)
+                    trie[trie[p].next[j]].fail = root;
+                else{
+                    trie[trie[p].next[j]].fail =
+                        trie[trie[p].fail].next[j];
+
+                    trie[trie[p].next[j]].flag |=
+                        trie[trie[trie[p].fail].next[j]].flag;
+                }
+            }
+            else{
+                if(trie[p].fail != -1)
+                    trie[p].next[j] = trie[trie[p].fail].next[j];
+            }
+        }
+    }
+}
+\end{verbatim}
