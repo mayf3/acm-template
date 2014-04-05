@@ -3,3 +3,4 @@
 .*.un~
 codelibrary*
 !codelibrary.tex
+!codelibrary.pdf

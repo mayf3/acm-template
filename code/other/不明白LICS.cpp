@@ -13,7 +13,6 @@ int cal_LIS(int a[], int f[], int x, int y) {
 			else f[i] = 0;
 			continue;
 		}
-
 		int l = 1, r = ret;
 		while (l <= r) {
 			int m = (l + r) / 2;
@@ -26,7 +25,6 @@ int cal_LIS(int a[], int f[], int x, int y) {
 		}
 		ret = max(ret, l);
 		b[l] = i; f[i] = l;
-
 		if (i && f[i - 1] > f[i]) f[i] = f[i - 1];
 	}
 	return ret;
@@ -35,7 +33,6 @@ int cal_LIS(int a[], int f[], int x, int y) {
 void prep() {
 	m = cal_LIS(a, u, -1, 0);
 	for (int i = 1; i <= m; ++i) list[i - 1] = b[i];
-
 	if (m > limit) {
 		memset(used, 0, sizeof(used));
 		for (int i = 0; i < limit; ++i) {
@@ -52,16 +49,12 @@ void prep() {
 void solve(int p) {
 	int curr = a[p];
 	int t[MAXN];
-
 	for (int i = 0; i < n; ++i) t[i] = a[(i + p + 1) % n];
-
 	memset(u, 0, sizeof(u));
 	cal_LIS(t, u, curr, 0);
-
 	reverse(t, t + n);
 	memset(v, 0, sizeof(v));
 	cal_LIS(t, v, curr, 1);
-
 	for (int i = 0; i <= n; ++i) {
 		int tmp = 1;
 		if (i) tmp += u[i - 1];
