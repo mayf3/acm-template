@@ -39,11 +39,9 @@ bool millerRabin(long long a, long long n) {
 bool isPrime(long long n) {
 	for (int i = 2; i < 1000 && i < n; ++i)
 		if (n % i == 0) return 0;
-
 	if (!millerRabin(2, n)) return 0;
 	if (!millerRabin(3, n)) return 0;
 	if (!millerRabin(5, n)) return 0;
 	if (!millerRabin(7, n)) return 0;
-
 	return 1;
 }
