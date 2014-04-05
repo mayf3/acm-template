@@ -1,0 +1,9 @@
+\subsubsection{O(n)求逆元}
+\begin{verbatim}
+inv[1]=1;
+rep(i, MD){
+	if (i < 2) continue;
+	inv[i] = - MD / i * (LL) inv[MD % i] % MD;
+	inv[i] = (inv[i] % MD + MD) % MD;
+}
+\end{verbatim}

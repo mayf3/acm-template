@@ -1,0 +1,32 @@
+\subsubsection{椭圆周长}
+\begin{verbatim}
+double const pi = atan2(0, -1.0);
+
+double cal(double a, double b) {
+    double e2 = 1.0 - b * b / a / a;
+    double e = e2;
+    double ret = 1.0;
+    double xa = 1.0, ya = 2.0;
+    double t = 0.25;
+
+    for (int i = 1; i <= 10000; ++i) {
+        ret -= t * e;
+        t = t * xa * (xa + 2) / (ya + 2) / (ya + 2);
+        xa += 2.0;
+        ya += 2.0;
+        e *= e2;
+    }
+    return 2.0 * pi * a * ret;
+}
+int main() {
+    int _ca = 1;
+    double a, b;
+    int T;
+    for (scanf("%d", &T); T--; ) {
+        scanf("%lf %lf", &a, &b);
+        if (a < b) swap(a, b);
+        printf("Case %d: %.10lf\n", _ca++, cal(a, b));
+    }
+    return 0;
+}
+\end{verbatim}
