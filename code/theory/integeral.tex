@@ -6,6 +6,29 @@
 #include <math.h>
 using namespace std;
 
+//{{{start
+double f(double x){
+	return 8 * sqrt(r * r - x * x) * sqrt(R * R - x * x);
+}
+
+double simpson(double width, double fa, double fb, double fc){
+	return (fb + fa + 4 * fc) * width / 6;
+}
+
+double asr(double a, double b, double eps, double A){
+	double c = (a + b) / 2;
+	double fa = f(a), fb = f(b), fc = f(c);
+	double L = simpson(c - a, fa, fc, f((c + a) / 2));
+	double R = simpson(b - c, fc, fb, f((b + c) / 2));
+	if (fabs(L + R - A) <= 15 * eps) return L + R + (L + R - A) / 15;
+	return asr(a, c, eps / 2, L) + asr(c, b, eps / 2, R);
+}
+
+double asr(double a, double b, double eps){
+	return asr(a, b, eps, simpson(b - a, f(a), f(b), f((b + a) / 2)));
+}
+//end}}}
+
 /* simpson integral of f at [a, b] */
 double simpson(double (*f)(double), double a, double b) {
     int n = (int)(10000 * (b - a)); n -= n % 2;
