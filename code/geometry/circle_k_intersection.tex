@@ -79,7 +79,6 @@ int main() {
   scanf("%d", &n);
   for (int i = 0; i < n; i++)
     scanf("%lf %lf %lf", &cs[i].o.x, &cs[i].o.y, &cs[i].r);
-
   memset(area, 0, sizeof area);
   for (circle *a = cs; a < cs + n; a++) {
     int cover = 1;
@@ -106,10 +105,8 @@ int main() {
   }
   for (int i = 1; i < n; i++)
     area[i] -= area[i + 1];
-
   for (int i = 1; i <= n; i++)
     printf("[%d] = %.3lf\n", i, area[i] / 2);
-
   return 0;
 }
 \end{verbatim}

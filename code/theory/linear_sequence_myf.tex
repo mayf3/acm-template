@@ -1,0 +1,202 @@
+\subsubsection{线性递推式+fft}
+\begin{verbatim}
+/* f[i] = a[i], i < m; 
+ * f[n] = b[0] * f[n - m] + ... + b[m - 1] * f[n - 1]; 
+ * given a[], b[], m, n; find f[n]
+ * O(M ^ 2 log N) 
+ * !!!!m = 1 特判
+ */
+using namespace std;
+
+typedef long long LL;
+typedef long long ULL;
+//typedef complex<double> Comp;
+
+const int N = 10000;
+const int MD = 5767169;
+const long double EPS = 0.05;
+const double PI = acos(-1.0);
+
+typedef complex<double> Comp;
+typedef Comp cp;
+
+const Comp I(0, 1);
+const int M = 1 << 15;
+
+Comp fft_a[M], fft_b[M];
+Comp tmp[M];
+
+int n, a, b, p, q;
+
+int fac[MD], inv[MD];
+
+inline int ex_gcd(int a, int b, int &x, int &y){
+	if (!a){
+		x = 0;
+		y = 1;
+		return b;
+	}
+	int g = ex_gcd(b % a, a, x, y);
+	int t = y;
+	y = x;
+	x = t - (b / a) * y;
+	return g;
+}
+
+inline int qmod(int x, int n){
+	int ret = 1, y = x % MD;
+	while(n){
+		if (n & 1) ret = (LL)ret * y % MD;
+		y = (LL)y * y % MD;
+		n >>= 1;
+	}
+	return ret;
+}
+
+inline int lucas(int n, int m){
+	int ret = 1;
+	while(n && m && ret){
+		int nn = n % MD, mm = m % MD;
+		if (nn < mm) return 0;
+		else ret = (LL)ret * fac[nn] % MD * inv[mm] % MD * inv[nn - mm] % MD;
+		n /= MD, m /= MD;
+	}
+	return ret;
+}
+
+void init(){
+	fac[0] = 1;
+	inv[0] = 1;
+	inv[1] = 1;
+	for(int i = 2; i < MD; i++){
+		inv[i] = -(LL)(MD / i) * inv[MD % i] % MD;
+	}
+	for(int i = 1; i < MD; i++){
+		fac[i] = ((LL)fac[i - 1] * i) % MD;
+		inv[i] = ((LL)inv[i - 1] * inv[i]) % MD;
+	}
+}
+
+void fft(Comp *a, int n, int f = 1){
+	double arg = PI;
+	for(int k = n >> 1; k; k >>= 1, arg *= 0.5) {
+		cp wm(cos(arg), f * sin(arg)), w(1, 0);
+		for (int i = 0; i < n; i += k, w *= wm) {
+			int p = i << 1;
+			if (p >= n) p -= n;
+			for (int j = 0; j < k; ++j) tmp[i + j] = a[p + j] + w * a[p + k + j];
+		}
+		rep(i,n) a[i] = tmp[i];
+	}
+}
+
+void calc(Comp *a, Comp *b, int n){
+	fft(a, n, 1);
+	fft(b, n, 1);
+	rep(i, n) a[i] = a[i] * b[i];
+	fft(a, n, -1);
+	rep(i, n) a[i] /= n;
+}
+
+int calc(int n, int m){
+	static int v[(M << 1) - 1], u[(M << 1) - 1], t[(M << 1) - 1];
+	int size = 1;
+	while (size <= 2 * m - 2) size *= 2;
+	rep(i, 2 * m - 1) v[i] = 0;
+	v[0] = 1;
+	int now = 1;
+	while(n){
+		if (now < m){
+			rep(i, 2 * m - 1) u[i] = 0;
+			u[now] = 1;
+		}
+		else{
+#ifdef FFT
+			rep(i, size) fft_a[i] = fft_b[i] = Comp(0, 0);
+			rep(i, m){
+				fft_a[i] = Comp(u[i], 0);
+				fft_b[i] = Comp(u[i], 0);
+			}
+			calc(fft_a, fft_b, size);
+			rep(i, m * 2 - 1) u[i] = (LL)(fft_a[i].real() + EPS) % MD;
+#else
+			for(int i = 0; i < m; i++) t[i] = u[i], u[i] = 0;
+			for(int i = 0; i < m; i++){
+				for(int j = 0; j < m; j++){
+					u[i + j] = (u[i + j] + (LL)t[i] * t[j]) % MD;
+				}
+			}
+#endif
+			for(int i = 2 * m - 2; i >= m; i--){
+				u[i - p] = (u[i - p] + (LL)a * u[i]) % MD;
+				u[i - q] = (u[i - q] + (LL)b * u[i]) % MD;
+				u[i] = 0;
+			}
+		}
+		if (n & 1){
+#ifdef FFT
+			rep(i, size) fft_a[i] = fft_b[i] = Comp(0, 0);
+			rep(i, m){
+				fft_a[i] = Comp(u[i], 0);
+				fft_b[i] = Comp(v[i], 0);
+			}
+			calc(fft_a, fft_b, size);
+			rep(i, m * 2 - 1) v[i] = (LL)(fft_a[i].real() + EPS) % MD;
+#else
+			for(int i = 0; i < m; i++) t[i] = v[i], v[i] = 0;
+			for(int i = 0; i < m; i++){
+				for(int j = 0; j < m; j++){
+					v[i + j] = (v[i + j] + (LL)t[i] * u[j]) % MD;
+				}
+			}
+#endif
+			for(int i = 2 * m - 2; i >= m; i--){
+				v[i - p] = (v[i - p] + (LL)a * v[i]) % MD;
+				v[i - q] = (v[i - q] + (LL)b * v[i]) % MD;
+				v[i] = 0;
+			}
+		}
+		now <<= 1;
+		n >>= 1;
+	}
+	return v[m - 1];
+}
+
+int main(){	
+	init();
+	while(~scanf("%d%d%d%d%d", &a, &b, &p, &q, &n)){
+		if (p > q) swap(p, q), swap(a, b);
+		int ret;
+		if (p == q){
+			if (n % p != 0){
+				ret = 0;
+			}
+			else{
+				ret = qmod(a + b, n);
+			}
+		}
+		else if (q <= 1000){
+			n += q - 1;
+			ret = calc(n, q);
+		}
+		else{
+			ret = 0;
+			int x, y;
+			int d = ex_gcd(p, q, x, y);
+			if (n % d != 0){
+				puts("0");
+				continue;
+			}
+			x = ((LL)x * n / d % (q / d) + (q / d)) % (q / d);
+			y = (n - p * x) / q;
+			while(y >= 0){
+				ret = (ret + (LL)qmod(a, x) * qmod(b, y) % MD * lucas(x + y, x) % MD) % MD;
+				x += q / d;
+				y -= p / d;
+			}
+		}
+		printf("%d\n", (ret % MD + MD) % MD);
+	}
+	return 0;
+}
+\end{verbatim}

@@ -1,5 +1,12 @@
 \subsubsection{线性递推式n*n*logn}
 \begin{verbatim}
+/* f[i] = a[i], i < m; 
+ * f[n] = b[0] * f[n - m] + ... + b[m - 1] * f[n - 1]; 
+ * given a[], b[], m, n; find f[n]
+ * O(M ^ 2 log N) 
+ * !!!!m = 1 特判
+ */
+
 const int M = 222;
 const int MD=1000000007;
 

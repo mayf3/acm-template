@@ -1,0 +1,56 @@
+\subsubsection{最长公共上升子序列}
+\begin{verbatim}
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+
+using namespace std;
+
+#define rep(i, n) for(int i = 0; i < (n); i++)
+
+int n, m;
+int a[1010],b[1010];
+int f[1010];
+
+int LCIS() {
+	memset(f, 0, sizeof(f));
+	rep(i, n){
+		int k = 0;
+		rep(j, m){
+			if(a[i] == b[j]){//如果a[i]==b[j] 
+				if(f[j]<f[k]+1){//就在0到j-1之间，找一个b[k]小于a[i]的f[k]值最大的解
+					f[j]=f[k]+1;
+				}
+			}
+			if(a[i]>b[j]){//0到j-1中，对于小于a[i]的，保存f值的最优解
+				if(f[k]<f[j]){
+					k=j;
+				}
+			}
+		}
+	}
+	int ans=0;
+	rep(i, m){
+		ans=max(ans,f[i]);
+	}
+	return ans;
+}
+
+int main() {
+	int t;
+	scanf("%d", &t);
+	while(t--) {
+		scanf("%d",&n);
+		rep(i, n){
+			scanf("%d",&a[i]);
+		}
+		scanf("%d",&m);
+		rep(j, m){
+			scanf("%d",&b[j]);
+		}
+		printf("%d\n",LCIS());
+		if (t) printf("\n");
+	}
+	return 0;
+}
+\end{verbatim}

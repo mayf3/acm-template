@@ -47,89 +47,87 @@
 	\input{code/graph/kth_shortest_path}
 
     \subsection{生成树}
-	%\input{code/graph/mst}
+	\input{code/graph/mst}
     %\input{code/graph/krusal}
     %\input{code/graph/prim}
     %\input{code/graph/prim_stl}
 	\input{code/graph/aroad}
 	\input{code/graph/mdst}
+	\input{code/graph/mdst_N2}
+	%\input{code/graph/mdst_NM}
 
 	\subsection{网络流}
-    %\input{code/graph/network_mode}
-	%\input{code/graph/maxflow}
-    %\input{code/graph/sap}
-	%\input{code/graph/dinic}
-	%\input{code/graph/min_cost_max_flow}
+	\input{code/graph/flow_with_lower_bounds.tex}
+	\input{code/graph/max_flow}
+	\input{code/graph/max_flow_fast}
+	\input{code/graph/min_cost_max_flow}
+	\input{code/graph/min_cost_max_flow_fast}
     %\input{code/graph/networkflow_limit}
-    %\input{code/graph/euler_circuit}
-    %\input{code/graph/network_cutpoint}
+    \input{code/graph/euler_circuit}
 	\input{code/graph/global_min_cut}
 	\input{code/graph/min_cut_tree}
 
 	\subsection{匹配}
-    %\input{code/graph/hungarian}
+    \input{code/graph/hungarian}
 	\input{code/graph/hopcroft_carp}
-    %\input{code/graph/km}
+    \input{code/graph/km}
 	\input{code/graph/edmonds_blossom}
 
     \subsection{图}
-	%\input{code/graph/tarjan}
-	\input{code/graph/max_clique}
-	\input{code/graph/tree_chain_divide}
+    \input{code/graph/hamilton}
     %\input{code/graph/kosaraju}
     \input{code/graph/cut_point_and_edge}
-    %\input{code/graph/hamilton}
+	\input{code/graph/cut_point_on_directed_graph}
+	\input{code/graph/tree_chain_divide}
 	\input{code/graph/tree_divide_edge}
 	\input{code/graph/tree_divide_point}
+	\input{code/graph/max_clique}
 	\input{code/graph/graph_complanation}
-	\input{code/graph/cut_point_on_directed_graph}
 
     %\subsection{最近公共祖先算法}
-    %\input{code/graph/lca_rmq}
-    %\input{code/graph/tarjan}
     %\input{code/graph/ancient_tree}
+    \input{code/graph/LCA_offline}
+    \input{code/graph/LCA_online}
 
 \section{\LARGE 数据结构}
 	\subsection{平衡树}
     \input{code/data_structure/heap}
-    %\input{code/data_structure/treap}
-	%\input{code/data_structure/binary_tree}
-    %\input{code/data_structure/bst}
+    \input{code/data_structure/bst}
+    \input{code/data_structure/treap}
 	\input{code/data_structure/splay}
-	%\input{code/data_structure/zkw_tree}
 
 	\subsection{图上的数据结构}
-	%\input{code/data_structure/leftist_tree}
-    \input{code/data_structure/link_cut_tree}
+	\input{code/data_structure/leftist_tree}
     \input{code/data_structure/subtree_link_cut_tree}
 
 	\subsection{可持久化数据结构}
-	%\input{code/data_structure/function_segment_tree}
 	\input{code/data_structure/function_treap}
-    %\input{code/data_structure/kthnumber}
+    \input{code/data_structure/kthnumber}
+
+	\subsection{其他}
+	\input{code/data_structure/rectangular_cut}
+	%\input{code/data_structure/rmq}
+	%\input{code/data_structure/rmq_2d}
 
 \section{\LARGE 字符串算法}
 	\subsection{基础}
-	%\input{code/string/string}
-	%\input{code/string/hash}
-    %\input{code/string/kmp}
+	\input{code/string/string}
+	\input{code/string/ELFhash}
+    \input{code/string/manacher}
+    \input{code/string/min_representation}
+    \input{code/string/kmp}
     \input{code/string/exkmp}
-    \input{code/string/aho_corasick}
     %\input{code/string/trie_tree}
-    %\input{code/string/min_representation}
-    %\input{code/string/manacher}
-	\input{code/string/trie_graph}
 
 	\subsection{进阶}
-    %\input{code/string/suffix}
-	%\input{code/string/suffix_automata}
-    %\input{code/string/trie_graph}
+	\input{code/string/suffix_automata}
+    \input{code/string/aho_corasick}
+	\input{code/string/suffix_automata}
+    \input{code/string/trie_graph}
 
 \section{\LARGE 计算几何}
 	\subsection{平面几何基础}
-    %\input{code/geometry/geometry}
-    \input{code/geometry/point}
-    \input{code/geometry/line}
+    \input{code/geometry/geometry}
     \input{code/geometry/circle}
     \input{code/geometry/center}
     \input{code/geometry/polygon}
@@ -147,67 +145,64 @@
 
 	\subsection{平面}
 	\input{code/geometry/half_plane_intersection}
-	%\input{code/geometry/dynamic_half_plane_intersection}
+	\input{code/geometry/dynamic_half_plane_intersection}
 	\input{code/geometry/rotate_calipers}
-    %\input{code/geometry/polygon_core}
 	\input{code/geometry/kd_tree}
 	\input{code/geometry/knn}
 	\input{code/geometry/range_tree}
 
 	\subsection{面积交}
-	\input{code/geometry/polygon_k_intersection}
-	%\input{code/geometry/two_polygon_intersection}
-	\input{code/geometry/circle_k_intersection}
 	\input{code/geometry/polygon_circle_intersection}
+	\input{code/geometry/polygon_k_intersection}
+	\input{code/geometry/two_polygon_intersection}
+	\input{code/geometry/circle_k_intersection}
 	\input{code/geometry/rectangle_and_some_circle_intersection}
 
 	\subsection{其他}
     \input{code/geometry/ellipse_circumference}
-	%\input{code/geometry/minium_circle_cover}
-    %\input{code/geometry/rectangular}
-	%\input{code/geometry/unionrectange}
-	%\input{code/geometry/circle_tree}
 
 \section{\LARGE 理论}
 	\subsection{数学}
     %\input{code/theory/math_conclusion}
     \input{code/theory/cubic_solver}
     \input{code/theory/integeral}
-    \input{code/theory/linear_sequence}
     \input{code/theory/gauss}
     \input{code/theory/fft}
     \input{code/theory/linear_programming}
+    \input{code/theory/linear_sequence}
+    \input{code/theory/linear_sequence_myf}
+	\input{code/theory/newton}
 
 	\subsection{数论}
-    %\input{code/theory/number_conclusion}
-	%\input{code/theory/combination_number}
-	\input{code/theory/exgcd}
-	\input{code/theory/pollard}
-	%\input{code/theory/prime_filter}
-	%\input{code/theory/mod_inv}
+	\input{code/theory/mod_inv}
     \input{code/theory/china}
+	\input{code/theory/exgcd}
+	\input{code/theory/combination_number}
+	\input{code/theory/Jacobi_symbol}
+	\input{code/theory/prime}
+	\input{code/theory/prime_random}
+	\input{code/theory/miller_ranbin}
+	\input{code/theory/pollard}
+	\input{code/theory/pell_equation}
     \input{code/theory/quadratic_residue}
-    %\input{code/theory/euler}
-	%\input{code/theory/mu}
-    %\input{code/theory/head}
-	%\input{code/theory/det_mod}
+    \input{code/theory/quadratic_residue_solution}
 
-	%\subsection{博弈论}
-	%\input{code/theory/sg}
-
-    %\subsection{特殊数列}
-    %\input{code/theory/fibonacci}
-    %\input{code/theory/catalan}
-    %\input{code/theory/stirling}
-	%\input{code/theory/schroder}
+	\subsection{博弈论}
+	\input{code/theory/nim_product}
 
 \section{\LARGE 其他}
-    \input{code/other/template}
+    \input{code/other/bignum}
+    \input{code/other/calculator}
+	\input{code/other/lics}
 	\input{code/other/roman}
-    \input{code/other/sgu261}
+	\input{code/other/max_sub_rect}
 	\input{code/other/dlx_exact_cover}
 	\input{code/other/dlx_multi_cover}
-	\input{code/other/max_sub_rect}
+	\input{code/other/NQueens}
+    \input{code/other/sgu_313}
+	\input{code/other/MIPT015}
+	\input{code/other/MIPT016}
+	\input{code/other/pku_3016}
 
 %CJK的时候使用
 %\end{CJK}

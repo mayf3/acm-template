@@ -44,11 +44,9 @@ double simpson(double (*f)(double), double a, double b) {
 double romberg(double (*f)(double), double l, double r) {
     const int N = 18;
     double a[N][N], p[N];
-
     p[0] = 1;
     for (int i = 1; i < N; i++)
         p[i] = p[i - 1] * 4;
-
     a[0][0] = (f(l) + f(r)) / 2;
     for (int i = 1, n = 2; i < N; i++, n <<= 1) {
         a[i][0] = 0;

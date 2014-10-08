@@ -7,6 +7,7 @@
 using namespace std;
 
 typedef long long ll;
+typedef long long LL;
 
 ll gcd(ll x, ll y) { 
     return !y ? x : gcd(y, x % y);
@@ -16,13 +17,18 @@ ll modular(ll a, ll b) {
     return (a % b + b) % b; 
 }
 
-/** m * a + n * b == gcd(m, n) */
-ll exgcd(ll m, ll n, ll &a, ll &b) { 
-    if (!n)
-        return a = 1, b = 0, m;
-    ll d = exgcd(n, m % n, b, a);
-    b -= m / n * a;
-    return d;
+/** a * x + b * y == gcd(a, b) */
+LL exgcd(LL a,LL b,LL &x,LL &y) {
+    if (!a){
+        x = 0;
+        y = 1;
+        return b;
+    }
+    LL g = exgcd(b % a, a, x, y);
+    LL t = y;
+    y = x;
+    x = t - (b / a) * y;
+    return g;
 }
 
 /** x * y % m == 1 */
@@ -65,19 +71,39 @@ ll modular_pow(ll x, ll y, ll m) {
     return r;
 }
 
-/** a ^ x % m == b */
-ll modular_log(ll a, ll b, ll m) {
-    static pair<ll, ll> table[10006];
-    ll s = (ll)ceil(sqrt(m));
-    for (ll j = 0, p = 1; j < s; j++, p = p * a % m) {
-        table[j] = pair<ll, ll>(p, j);
-    }
-    stable_sort(table, table + s);
-    ll c = invert(modular_pow(a, s, m), m); // c = a ^ (-m)
-    for (ll i = 0; i < m; i++, b = b * c % m) {
-        int k = lower_bound(table, table + s, pair<ll, ll>(b, -1)) - table;
-        if (k < s && table[k].first == b) return i * s + table[k].second;
-    }
-    return -1;
+//a ^ x = b (mod n), n is prime
+int mod_log(int a, int b, int n) {
+	int m = (int)ceil(sqrt(n)), inv = Inv(mod_exp(a, m, n), n);
+	id[0] = 0; mexp[0] = 1;
+	for (int i = 1; i < m; ++i) id[i] = i, mexp[i] = (long long)mexp[i - 1] * a % n;
+	sort(id, id + m, logcmp); sort(mexp, mexp + m);
+	for (int i = 0; i < m; ++i) {
+		int j = lower_bound(mexp, mexp + m, b) - mexp;
+		if (j < m && mexp[j] == b) return i * m + id[j];
+		b = (long long)b * inv % n;
+	}
+	return -1;
+}
+
+// A ^ x = B (mod C)
+// return x, -1 means no solution
+int Dlog(int A, int B, int C) {
+	map<int, int> Hash;
+	int D = 1 % C;
+	for(int j = D, i = 0;i <= 100; j = (long long)j * A % C, ++i)
+		if (j == B) return i;
+	int d = 0;
+	for (int g; (g = gcd(A, C)) != 1; ) {
+		if (B % g)return -1;
+		++d; C /= g; B /= g; D = (long long)D * A / g % C;
+	}
+	int M = (int)ceil(sqrt((double)C));
+	for (int j = 1 % C, i = 0; i <= M; j = (long long)j * A % C, ++i)
+		if (Hash.find(j) == Hash.end()) Hash[j] = i;
+	for (int j = mod_exp(A, M, C), i = 0; i <= M; D = (long long)D * j % C, ++i) {
+		int tmp = Inval(D, B, C);
+		if (tmp >= 0 && Hash.find(tmp) != Hash.end()) return i * M + Hash[tmp] + d;
+	}
+	return -1;
 }
 \end{verbatim}

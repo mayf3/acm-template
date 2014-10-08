@@ -1,4 +1,4 @@
-\subsubsection{最小树形图}
+\subsubsection{最小树形图,输出边}
 \begin{verbatim}
 #include <cstdio>
 #include <cstring>
@@ -53,7 +53,6 @@ void work() {
             ans = dist[u][list[u][n - 1]] + dist[u][list[u][n - 2]];
             x = y = u;
         }
-
     for (int u = 0; u < n; ++u)
         for (int v = u + 1; v < n; ++v)
             if (map[u][v] < maxnum) {
@@ -88,7 +87,6 @@ void print() {
             else c[i] = (dist[y][i] + map[x][y]) * 2 - p;
         p = 2;
     }
-
     memset(used, 0, sizeof(used));
     int t = 1;
     Q[0] = x; used[x] = 1;
