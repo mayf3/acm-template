@@ -73,37 +73,37 @@ ll modular_pow(ll x, ll y, ll m) {
 
 //a ^ x = b (mod n), n is prime
 int mod_log(int a, int b, int n) {
-	int m = (int)ceil(sqrt(n)), inv = Inv(mod_exp(a, m, n), n);
-	id[0] = 0; mexp[0] = 1;
-	for (int i = 1; i < m; ++i) id[i] = i, mexp[i] = (long long)mexp[i - 1] * a % n;
-	sort(id, id + m, logcmp); sort(mexp, mexp + m);
-	for (int i = 0; i < m; ++i) {
-		int j = lower_bound(mexp, mexp + m, b) - mexp;
-		if (j < m && mexp[j] == b) return i * m + id[j];
-		b = (long long)b * inv % n;
-	}
-	return -1;
+    int m = (int)ceil(sqrt(n)), inv = Inv(mod_exp(a, m, n), n);
+    id[0] = 0; mexp[0] = 1;
+    for (int i = 1; i < m; ++i) id[i] = i, mexp[i] = (long long)mexp[i - 1] * a % n;
+    sort(id, id + m, logcmp); sort(mexp, mexp + m);
+    for (int i = 0; i < m; ++i) {
+        int j = lower_bound(mexp, mexp + m, b) - mexp;
+        if (j < m && mexp[j] == b) return i * m + id[j];
+        b = (long long)b * inv % n;
+    }
+    return -1;
 }
 
 // A ^ x = B (mod C)
 // return x, -1 means no solution
 int Dlog(int A, int B, int C) {
-	map<int, int> Hash;
-	int D = 1 % C;
-	for(int j = D, i = 0;i <= 100; j = (long long)j * A % C, ++i)
-		if (j == B) return i;
-	int d = 0;
-	for (int g; (g = gcd(A, C)) != 1; ) {
-		if (B % g)return -1;
-		++d; C /= g; B /= g; D = (long long)D * A / g % C;
-	}
-	int M = (int)ceil(sqrt((double)C));
-	for (int j = 1 % C, i = 0; i <= M; j = (long long)j * A % C, ++i)
-		if (Hash.find(j) == Hash.end()) Hash[j] = i;
-	for (int j = mod_exp(A, M, C), i = 0; i <= M; D = (long long)D * j % C, ++i) {
-		int tmp = Inval(D, B, C);
-		if (tmp >= 0 && Hash.find(tmp) != Hash.end()) return i * M + Hash[tmp] + d;
-	}
-	return -1;
+    map<int, int> Hash;
+    int D = 1 % C;
+    for(int j = D, i = 0;i <= 100; j = (long long)j * A % C, ++i)
+        if (j == B) return i;
+    int d = 0;
+    for (int g; (g = gcd(A, C)) != 1; ) {
+        if (B % g)return -1;
+        ++d; C /= g; B /= g; D = (long long)D * A / g % C;
+    }
+    int M = (int)ceil(sqrt((double)C));
+    for (int j = 1 % C, i = 0; i <= M; j = (long long)j * A % C, ++i)
+        if (Hash.find(j) == Hash.end()) Hash[j] = i;
+    for (int j = mod_exp(A, M, C), i = 0; i <= M; D = (long long)D * j % C, ++i) {
+        int tmp = Inval(D, B, C);
+        if (tmp >= 0 && Hash.find(tmp) != Hash.end()) return i * M + Hash[tmp] + d;
+    }
+    return -1;
 }
 \end{verbatim}

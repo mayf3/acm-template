@@ -1,7 +1,7 @@
 \subsubsection{数学结论}
 \begin{verbatim}
 五边形定理
-五边形数 n * (3 * n - 1) / 2
+五边形数 n * (3 * n +- 1) / 2
 
 fibonacci数性质:
 f[n] = f[n - 1] + f[n - 2]
@@ -60,6 +60,11 @@ f(x)不存在重根<=>gcd(f(x), f‘(x))的次数小于1次
 a^n % b = a^(n % phi(b) + phi(b)) % b (n >= phi(b))
 lucas定理 c(n, m) = c(n % p, m % p) * c(n / p, m / p) % p
 lucas函数 满足 f(n, m) = f(n % p, m % p) * f(n / p, m / p) % p, 可以猜测满足
+
+原根
+2,4,p^k,2*p^k存在原根，存在原根则原根数量为phi(phi(n))
+验证原根x = phi(n), x = p1^a1*p2^a2..pk^ak
+原根满足t ^ (x / pi) != 1 (mod n)
 
 罗马数字性质
 \end{verbatim}

@@ -2,70 +2,70 @@
 \begin{verbatim}
 //在异或方程里，要求最小改变次数，那就从后往前面枚举，先枚举只有变量之后，前面的变量就确定了
 void gauss(int n, int m, double p[M][M]){
-	static double tmp[M][M];
-	static double *b[M];
-	rep(i, n){
-		rep(j, m){
-			tmp[i][j] = p[i][j];
-		}
-	}
-	rep(i, n){
-		b[i] = tmp[i];
-	}
-	rep(i, n){
-		REP(j, i, n){
-			if (sign(fabs(b[j][i]) - fabs(b[i][i])) > 0) swap(b[i], b[j]);
-		}
-		rep(j, n){
-			if (i == j) continue;
-			double rate = b[j][i] / b[i][i];
-			rep(k, m) b[j][k] -= b[i][k] * rate;
-		}
-		double rate = b[i][i];
-		rep(j, m) b[i][j] /= rate;
-	}
-	rep(i, n){
-		rep(j, m){
-			p[i][j] = b[i][j];
-		}
-	}
+    static double tmp[M][M];
+    static double *b[M];
+    rep(i, n){
+        rep(j, m){
+            tmp[i][j] = p[i][j];
+        }
+    }
+    rep(i, n){
+        b[i] = tmp[i];
+    }
+    rep(i, n){
+        REP(j, i, n){
+            if (sign(fabs(b[j][i]) - fabs(b[i][i])) > 0) swap(b[i], b[j]);
+        }
+        rep(j, n){
+            if (i == j) continue;
+            double rate = b[j][i] / b[i][i];
+            rep(k, m) b[j][k] -= b[i][k] * rate;
+        }
+        double rate = b[i][i];
+        rep(j, m) b[i][j] /= rate;
+    }
+    rep(i, n){
+        rep(j, m){
+            p[i][j] = b[i][j];
+        }
+    }
 }
 
 //整数答案不超过LL，可以用辗转相除法做高斯消元
 void gauss(int n, int m, T p[M][M], T& ret){
-	static T tmp[M][M];
-	static T *b[M];
-	rep(i, n){
-		rep(j, m){
-			tmp[i][j] = p[i][j];
-		}
-	}
-	rep(i, n){
-		b[i] = tmp[i];
-	}
-	rep(i, n){
-		REP(j, i, n){
-			if (abs(b[j][i]) > abs(b[i][i])) swap(b[i], b[j]);
-		}
-		if (b[i][i] == 0){
-			ret = 0;
-			return;
-		}
-		REP(j, i + 1, n){
-			if (b[j][i] == 0) continue;
-			while(b[j][i]){
-				if (abs(b[i][i]) > abs(b[j][i])) swap(b[i], b[j]);
-				LL rate = b[j][i] / b[i][i];
-				REP(k, i, m) b[j][k] = b[j][k] - b[i][k] * rate;
-			}
-		}
-		ret *= b[i][i];
-		ret = abs(ret) % MD;
-	}
-	rep(i, n){
-		rep(j, m){
-			p[i][j] = b[i][j];
-		}
-	}
+    static T tmp[M][M];
+    static T *b[M];
+    rep(i, n){
+        rep(j, m){
+            tmp[i][j] = p[i][j];
+        }
+    }
+    rep(i, n){
+        b[i] = tmp[i];
+    }
+    rep(i, n){
+        REP(j, i, n){
+            if (abs(b[j][i]) > abs(b[i][i])) swap(b[i], b[j]);
+        }
+        if (b[i][i] == 0){
+            ret = 0;
+            return;
+        }
+        REP(j, i + 1, n){
+            if (b[j][i] == 0) continue;
+            while(b[j][i]){
+                if (abs(b[i][i]) > abs(b[j][i])) swap(b[i], b[j]);
+                LL rate = b[j][i] / b[i][i];
+                REP(k, i, m) b[j][k] = b[j][k] - b[i][k] * rate;
+            }
+        }
+        ret *= b[i][i];
+        ret = abs(ret) % MD;
+    }
+    rep(i, n){
+        rep(j, m){
+            p[i][j] = b[i][j];
+        }
+    }
 }
 \end{verbatim}

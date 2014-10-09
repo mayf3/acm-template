@@ -4,77 +4,77 @@ const int D = 18;
 const int N = 100000 + 1000;
 
 struct Tree{
-	int n;
-	int v[N];
-	int val[D][N], to_left[D][N];
-	LL sum_l[D][N];
+    int n;
+    int v[N];
+    int val[D][N], to_left[D][N];
+    LL sum_l[D][N];
 
-	void build(int l, int r, int deep){
-		if (l == r) return;
-		int mid = (l + r) / 2, left_same = mid - l + 1;
-		for(int i = l; i <= r; i++){
-			if (val[deep][i] < v[mid]) left_same--;
-		}
-		int le = l, ri = mid + 1, same = 0;
-		sum_l[deep][0] = 0;
-		for(int i = l; i <= r; i++){
-			to_left[deep][i] = (i == l) ? 0 : to_left[deep][i - 1];
-			sum_l[deep][i] = sum_l[deep][i - 1];
-			if (val[deep][i] < v[mid]){
-				to_left[deep][i]++;
-				sum_l[deep][i] += val[deep][i];
-				val[deep + 1][le++] = val[deep][i];
-			}
-			else if (val[deep][i] > v[mid]){
-				val[deep + 1][ri++] = val[deep][i];
-			}
-			else if (same < left_same){
-				to_left[deep][i]++;
-				sum_l[deep][i] += val[deep][i];
-				val[deep + 1][le++] = val[deep][i];
-				same++;
-			}
-			else{
-				val[deep + 1][ri++] = val[deep][i];
-			}
-		}
-		build(l, mid, deep + 1);
-		build(mid + 1, r, deep + 1);
-	}
+    void build(int l, int r, int deep){
+        if (l == r) return;
+        int mid = (l + r) / 2, left_same = mid - l + 1;
+        for(int i = l; i <= r; i++){
+            if (val[deep][i] < v[mid]) left_same--;
+        }
+        int le = l, ri = mid + 1, same = 0;
+        sum_l[deep][0] = 0;
+        for(int i = l; i <= r; i++){
+            to_left[deep][i] = (i == l) ? 0 : to_left[deep][i - 1];
+            sum_l[deep][i] = sum_l[deep][i - 1];
+            if (val[deep][i] < v[mid]){
+                to_left[deep][i]++;
+                sum_l[deep][i] += val[deep][i];
+                val[deep + 1][le++] = val[deep][i];
+            }
+            else if (val[deep][i] > v[mid]){
+                val[deep + 1][ri++] = val[deep][i];
+            }
+            else if (same < left_same){
+                to_left[deep][i]++;
+                sum_l[deep][i] += val[deep][i];
+                val[deep + 1][le++] = val[deep][i];
+                same++;
+            }
+            else{
+                val[deep + 1][ri++] = val[deep][i];
+            }
+        }
+        build(l, mid, deep + 1);
+        build(mid + 1, r, deep + 1);
+    }
 
-	pair<int, LL> ask(int ask_l, int ask_r, int l, int r, int deep, int kth){ 
-		if (l == r) return MP(val[deep][l], val[deep][l]);
-		int mid = (l + r) / 2, s1, s2;
-		if (l == ask_l){
-			s1 = 0;
-			s2 = to_left[deep][ask_r];
-		}
-		else{
-			s1 = to_left[deep][ask_l - 1];
-			s2 = to_left[deep][ask_r];
-		}
-		if (s2 - s1 >= kth){
-			ask_l = l + s1, ask_r = ask_l + s2 - s1 - 1;
-			return ask(ask_l, ask_r, l, mid, deep + 1, kth);
-		}
-		else{
-			LL ret = sum_l[deep][ask_r] - sum_l[deep][ask_l - 1];
-			kth = kth - (s2 - s1);
-			s2 = ask_r - ask_l + 1 - (s2 - s1);
-			ask_l = mid + ask_l - l + 1 - s1;
-			ask_r = ask_l + s2 - 1;
-			pair<int, LL> tmp = ask(ask_l, ask_r, mid + 1, r, deep + 1, kth);
-			return MP(tmp.F, tmp.S + ret);
-		}
-	}
+    pair<int, LL> ask(int ask_l, int ask_r, int l, int r, int deep, int kth){ 
+        if (l == r) return MP(val[deep][l], val[deep][l]);
+        int mid = (l + r) / 2, s1, s2;
+        if (l == ask_l){
+            s1 = 0;
+            s2 = to_left[deep][ask_r];
+        }
+        else{
+            s1 = to_left[deep][ask_l - 1];
+            s2 = to_left[deep][ask_r];
+        }
+        if (s2 - s1 >= kth){
+            ask_l = l + s1, ask_r = ask_l + s2 - s1 - 1;
+            return ask(ask_l, ask_r, l, mid, deep + 1, kth);
+        }
+        else{
+            LL ret = sum_l[deep][ask_r] - sum_l[deep][ask_l - 1];
+            kth = kth - (s2 - s1);
+            s2 = ask_r - ask_l + 1 - (s2 - s1);
+            ask_l = mid + ask_l - l + 1 - s1;
+            ask_r = ask_l + s2 - 1;
+            pair<int, LL> tmp = ask(ask_l, ask_r, mid + 1, r, deep + 1, kth);
+            return MP(tmp.F, tmp.S + ret);
+        }
+    }
 
-	void init(int n, int other[]){
-		for(int i = 1; i <= n; i++){
-			v[i] = other[i];
-			val[0][i] = v[i];
-		}
-		sort(v + 1, v + n + 1);
-		build(1, n, 0);
-	}
+    void init(int n, int other[]){
+        for(int i = 1; i <= n; i++){
+            v[i] = other[i];
+            val[0][i] = v[i];
+        }
+        sort(v + 1, v + n + 1);
+        build(1, n, 0);
+    }
 }tree;
 \end{verbatim}

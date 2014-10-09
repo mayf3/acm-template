@@ -6,7 +6,6 @@ Trains travel in both directions, and take 1 minute to get from a station to the
 There are n employee's houses along the railway, and n offices, each house or office located near a railway station. 
 You are to establish a one-to-one correspondence between houses and offices in such a way that total travel time (sum of travel times of each employee) is minimized.
 */
-
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
@@ -16,7 +15,7 @@ using namespace std;
 const int maxn = 50000 + 10;
 
 struct Tobj {
-	int loc, sign;
+    int loc, sign;
 };
 
 Tobj obj[maxn * 2];
@@ -26,69 +25,63 @@ int match[maxn];
 int n, l;
 
 bool cmp(Tobj i, Tobj j) {
-	return i.loc < j.loc;
+    return i.loc < j.loc;
 }
 
 int main() {
-	scanf("%d%d", &n, &l);
-	for (int i = 1; i <= n; ++i) {
-		scanf("%d", &obj[i].loc);
-		obj[i].sign = i;
-	}
-	for (int i = 1; i <= n; ++i) {
-		scanf("%d", &obj[n + i].loc);
-		obj[n + i].sign = -i;
-	}
-
-	sort(obj + 1, obj + n * 2 + 1, cmp);
-
-	int p = n + 1, delta = 0, now = 0;
-	long long sum = 0, len = l - (obj[n * 2].loc - obj[1].loc);
-	tab[delta + p] = len;
-	for (int i = 2; i <= n * 2; ++i) {
-		if (obj[i - 1].sign > 0) ++now;
-		else --now;
-		len = obj[i].loc - obj[i - 1].loc;
-		sum += len * abs(now);
-		tab[now + delta + p] += len;
-	}
-	for (int i = -n; i <= n; ++i) tab[i + p] += tab[i - 1 + p];
-
-	long long ans = -1;
-	int broken;
-	for (int i = 1; i <= n * 2; ++i) {
-		if (ans == -1 || sum < ans) {
-			ans = sum;
-			broken = i;
-		}
-		if (obj[i].sign > 0) {
-			sum -= (long long)(l - tab[delta + p]) - tab[delta + p];
-			++delta;
-		}
-		else {
-			sum += (long long)(l - tab[delta - 1 + p]) - tab[delta - 1 + p];
-			--delta;
-		}
-	}
-
-	int top = 0, i = broken;
-	do {
-		stack[top++] = obj[i].sign;
-		while (top >= 2 && (stack[top - 1] > 0) != (stack[top - 2] > 0)) {
-			if (stack[top - 1] > 0) match[stack[top - 1]] = -stack[top - 2];
-			else match[stack[top - 2]] = -stack[top - 1];
-			top -= 2;
-		}
-		if ((++i) > n * 2) i = 1;
-	} while (i != broken);
-
-	printf("%I64d\n", ans);
-	for (int i = 1; i <= n; ++i) {
-		if (i > 1) printf(" ");
-		printf("%d", match[i]);
-	}
-	printf("\n");
-
-	return 0;
+    scanf("%d%d", &n, &l);
+    for (int i = 1; i <= n; ++i) {
+        scanf("%d", &obj[i].loc);
+        obj[i].sign = i;
+    }
+    for (int i = 1; i <= n; ++i) {
+        scanf("%d", &obj[n + i].loc);
+        obj[n + i].sign = -i;
+    }
+    sort(obj + 1, obj + n * 2 + 1, cmp);
+    int p = n + 1, delta = 0, now = 0;
+    long long sum = 0, len = l - (obj[n * 2].loc - obj[1].loc);
+    tab[delta + p] = len;
+    for (int i = 2; i <= n * 2; ++i) {
+        if (obj[i - 1].sign > 0) ++now;
+        else --now;
+        len = obj[i].loc - obj[i - 1].loc;
+        sum += len * abs(now);
+        tab[now + delta + p] += len;
+    }
+    for (int i = -n; i <= n; ++i) tab[i + p] += tab[i - 1 + p];
+    long long ans = -1;
+    int broken;
+    for (int i = 1; i <= n * 2; ++i) {
+        if (ans == -1 || sum < ans) {
+            ans = sum;
+            broken = i;
+        }
+        if (obj[i].sign > 0) {
+            sum -= (long long)(l - tab[delta + p]) - tab[delta + p];
+            ++delta;
+        }
+        else {
+            sum += (long long)(l - tab[delta - 1 + p]) - tab[delta - 1 + p];
+            --delta;
+        }
+    }
+    int top = 0, i = broken;
+    do {
+        stack[top++] = obj[i].sign;
+        while (top >= 2 && (stack[top - 1] > 0) != (stack[top - 2] > 0)) {
+            if (stack[top - 1] > 0) match[stack[top - 1]] = -stack[top - 2];
+            else match[stack[top - 2]] = -stack[top - 1];
+            top -= 2;
+        }
+        if ((++i) > n * 2) i = 1;
+    } while (i != broken);
+    printf("%I64d\n", ans);
+    for (int i = 1; i <= n; ++i) {
+        if (i > 1) printf(" ");
+        printf("%d", match[i]);
+    }
+    printf("\n");
+    return 0;
 }
 \end{verbatim}

@@ -1,4 +1,4 @@
-\subsubsection{最大流(快)}
+\subsubsection{最大流(lby)}
 \begin{verbatim}
 const int inf = 0x3f3f3f3f;
 const LL infLL = 0x3f3f3f3f3f3f3f3fLL;
@@ -7,79 +7,79 @@ const int maxn = 100000 + 5;
 const int maxe = 200000 + 5;
 
 class SAP {
-	int n, psz, s, t;
-	struct Edge {
-		int v, r;
-		Edge *next, *cp;
-	} epool[maxe], *e[maxn], *cur[maxn];
-	int dis[maxn], gap[maxn], pre[maxn];
+    int n, psz, s, t;
+    struct Edge {
+        int v, r;
+        Edge *next, *cp;
+    } epool[maxe], *e[maxn], *cur[maxn];
+    int dis[maxn], gap[maxn], pre[maxn];
 
-	void bfs() {
-		queue<int> que;
-		memset(dis, 0x3f, sizeof(dis));
-		memset(gap, 0, sizeof(gap));
-		dis[t] = 0; que.push(t);
-		while (!que.empty()) {
-			int u = que.front(); que.pop(); ++gap[dis[u]];
-			for (Edge *i = e[u]; i; i = i->next) {
-				int v = i->v;
-				if (i->cp->r && dis[v] == inf) {
-					dis[v] = dis[u] + 1;
-					que.push(v);
-				}
-			}
-		}
-	}
+    void bfs() {
+        queue<int> que;
+        memset(dis, 0x3f, sizeof(dis));
+        memset(gap, 0, sizeof(gap));
+        dis[t] = 0; que.push(t);
+        while (!que.empty()) {
+            int u = que.front(); que.pop(); ++gap[dis[u]];
+            for (Edge *i = e[u]; i; i = i->next) {
+                int v = i->v;
+                if (i->cp->r && dis[v] == inf) {
+                    dis[v] = dis[u] + 1;
+                    que.push(v);
+                }
+            }
+        }
+    }
 
-	int aug(int &u) {
-		if (u == t) {
-			int d = inf;
-			for (int i = s; i != t; i = cur[i]->v)
-				if (cur[i]->r < d) d = cur[i]->r, u = i;
-			for (int i = s; i != t; i = cur[i]->v)
-				cur[i]->r -= d, cur[i]->cp->r += d;
-			return d;
-		}
-		for (Edge *i = e[u]; i; i = i->next) {
-			int v = i->v;
-			if (i->r && dis[u] == dis[v] + 1) {
-				cur[u] = i; pre[v] = u; u = v;
-				return 0;
-			}
-		}
-		if (--gap[dis[u]]) {
-			int d = n;
-			for (Edge *i = e[u]; i; i = i->next) {
-				int v = i->v;
-				if (i->r && dis[v] < d) d = dis[v], cur[u] = i;
-			}
-			++gap[dis[u]=d+1];
-			if (u != s) u = pre[u];
-		} else {
-			dis[s] = n;
-		}
-		return 0;
-	}
-	public:
-	void init(int n) {
-		this->n = n; psz = 0;
-		memset(e, 0, sizeof(e));
-	}
-	void add_edge(int u, int v, int w) {
-		Edge *i = epool + psz++;
-		i->v = v; i->r = w; i->next = e[u]; e[u] = i;
-		i->cp = epool + ((psz - 1) ^ 1);
-		if (psz & 1) add_edge(v, u, w);
-	}
-	int max_flow(int s, int t) {
-		int flow = 0;
-		this->s = s, this->t = t;
-		bfs();
-		// memset(dis, 0, sizeof(dis));
-		// memset(gap, 0, sizeof(gap)); gap[0] = n;
-		for (int i = 0; i < n; ++i) cur[i] = e[i];
-		for (int i = s; dis[s] < n; flow += aug(i));
-		return flow;
-	}
+    int aug(int &u) {
+        if (u == t) {
+            int d = inf;
+            for (int i = s; i != t; i = cur[i]->v)
+                if (cur[i]->r < d) d = cur[i]->r, u = i;
+            for (int i = s; i != t; i = cur[i]->v)
+                cur[i]->r -= d, cur[i]->cp->r += d;
+            return d;
+        }
+        for (Edge *i = e[u]; i; i = i->next) {
+            int v = i->v;
+            if (i->r && dis[u] == dis[v] + 1) {
+                cur[u] = i; pre[v] = u; u = v;
+                return 0;
+            }
+        }
+        if (--gap[dis[u]]) {
+            int d = n;
+            for (Edge *i = e[u]; i; i = i->next) {
+                int v = i->v;
+                if (i->r && dis[v] < d) d = dis[v], cur[u] = i;
+            }
+            ++gap[dis[u]=d+1];
+            if (u != s) u = pre[u];
+        } else {
+            dis[s] = n;
+        }
+        return 0;
+    }
+    public:
+    void init(int n) {
+        this->n = n; psz = 0;
+        memset(e, 0, sizeof(e));
+    }
+    void add_edge(int u, int v, int w) {
+        Edge *i = epool + psz++;
+        i->v = v; i->r = w; i->next = e[u]; e[u] = i;
+        i->cp = epool + ((psz - 1) ^ 1);
+        if (psz & 1) add_edge(v, u, w);
+    }
+    int max_flow(int s, int t) {
+        int flow = 0;
+        this->s = s, this->t = t;
+        bfs();
+        // memset(dis, 0, sizeof(dis));
+        // memset(gap, 0, sizeof(gap)); gap[0] = n;
+        for (int i = 0; i < n; ++i) cur[i] = e[i];
+        for (int i = s; dis[s] < n; flow += aug(i));
+        return flow;
+    }
 } graph;
 \end{verbatim}
