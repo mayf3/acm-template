@@ -1,0 +1,95 @@
+\subsubsection{FWT}
+\begin{verbatim}
+#include <cstdio>
+
+typedef long long LL;
+
+const int N = 1 << 10;
+
+/* xor: 
+ *   FWT:
+ *     a[i] = x + y;
+ *     a[i + len] = x - y;
+ *  unFWT:
+ *    a[i] = (x + y) / 2;
+ *    a[i + len] = (x - y) / 2;
+ */
+
+/* and: 
+ *   FWT:
+ *     a[i] = x + y;
+ *     a[i + len] = y;
+ *  unFWT:
+ *    a[i] = x - y;
+ *    a[i + len] = y;
+ */
+
+/* or: 
+ *   FWT:
+ *     a[i] = x;
+ *     a[i + len] = y + x;
+ *  unFWT:
+ *    a[i] = x;
+ *    a[i + len] = y - x;
+ */
+
+void FWT(LL a[], int l, int r){
+  if (l == r - 1) return;
+  int len = (r - l) >> 1;
+  int mid = l + len;
+  FWT(a, l, mid);
+  FWT(a, mid, r);
+  for(int i = l; i < mid; i++){
+    LL x = a[i], y = a[i + len];
+    a[i] = x + y;
+    a[i + len] = x - y;
+  }
+}
+
+void unFWT(LL a[], int l, int r){
+  if (l == r - 1) return;
+  int len = (r - l) >> 1;
+  int mid = l + len;
+  for(int i = l; i < mid; i++){
+    LL x = a[i], y = a[i + len];
+    a[i] = (x + y) / 2;
+    a[i + len] = (x - y) / 2;
+  }
+  unFWT(a, l, mid);
+  unFWT(a, mid, r);
+}
+
+int n, m;
+LL a[N], b[N], c[N];
+
+int main(){
+  int T;
+  scanf("%d", &T);
+  for(int cas = 1; cas <= T; cas++){
+    scanf("%d%d", &n, &m);
+    for(int i = 0; i < N; i++){
+      a[i] = b[i] = c[i] = 0;
+    }
+    for(int i = 0; i < n; i++){
+      int x, y;
+      scanf("%d%d", &x, &y);
+      a[y] += x;
+    }
+    for(int i = 0; i < m; i++){
+      int x, y;
+      scanf("%d%d", &x, &y);
+      b[y] += x;
+    }
+    FWT(a, 0, N);
+    FWT(b, 0, N);
+    for(int i = 0; i < N; i++){
+      c[i] = a[i] * b[i];
+    }
+    unFWT(c, 0, N);
+    for(int i = 0; i < N; i++){
+      printf("%lld ", c[i]);
+    }
+    puts("");
+  }
+}
+\end{verbatim}

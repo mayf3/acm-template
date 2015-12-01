@@ -1,0 +1,124 @@
+\subsubsection{ex BSGS}
+\begin{verbatim}
+// get the number of x 
+// a ^ x = d (mod p) where x >= 0 && x <= m
+#include <cstdio>
+#include <iostream>
+#include <tr1/unordered_map>
+#include <cmath>
+
+using namespace std;
+using namespace std::tr1;
+
+typedef long long LL;
+typedef unsigned long long ULL;
+
+int a, p, d;
+LL m;
+
+int qmod(int a, int n, int p){
+  int ret = 1;
+  while(n){
+    if (n & 1) ret = 1LL * ret * a % p;
+    a = 1LL * a * a % p;
+    n >>= 1;
+  }
+  return ret;
+}
+
+int gcd(int a, int b) { 
+  return !b ? a : gcd(b, a % b);
+}
+
+LL modular(LL a, LL b) { 
+  return (a % b + b) % b; 
+}
+
+LL exgcd(LL a,LL b,LL &x,LL &y) {
+  if (!a) return x = 0, y = 1, b;
+  LL g = exgcd(b % a, a, x, y);
+  LL t = y;
+  y = x;
+  x = t - (b / a) * y;
+  return g;
+}
+
+LL invert(LL x, LL m)  { 
+  LL a, b;
+  exgcd(x, m, a, b);
+  return modular(a, m);
+}
+
+// a^x = b (mod p)
+int log_mod(int a, int b, int p, int &len){
+  a %= p, b %= p;
+  if (a == 0){
+    if (b == 0){
+      len = 1;
+      return 0;
+    }
+    return -1;
+  }
+  int m = ceil(sqrt(p)), iv = qmod(invert(a, p), m, p);
+  unordered_map<int, int> dict;
+  dict[1] = 0;
+  int now = 1;
+  len = -1;
+  for(int i = 1; i < m; i++) {
+    now = 1LL * now * a % p;
+    if (now == 1) {
+      if (len == -1) len = i;
+    }
+    if (dict.count(now)) continue;
+    dict[now] = i;
+  }
+  int ans = -1;
+  for(int i = 0; i <= m; i++){
+    if (dict.count(b)){
+      ans = i * m + dict[b];
+      break;
+    }
+    b = 1LL * b * iv % p;
+  }
+  b = iv;
+  for(int i = 1; i <= m; i++){
+    if (dict.count(b)){
+      if (len == -1){
+        len = i * m + dict[b];
+        break;
+      }
+    }
+    b = 1LL * b * iv % p;
+  }
+  return ans;
+}
+
+ULL work(){
+  int cnt = 0;
+  int now = 1;
+  while(true){
+    int g = gcd(a, p);
+    if (g == 1){
+      int iv = invert(now, p);
+      int len;
+      int pos = log_mod(a, 1LL * d * iv % p, p, len);
+      if (pos < 0 || pos + cnt > m) return 0;
+      return (ULL)1 + (m - pos - cnt) / len;
+    }
+    if (now % p == d) return 1;
+    if (d % g) return 0;
+    d /= g;
+    p /= g;
+    now = 1LL * now * (a / g) % p;
+    cnt++;
+  }
+}
+
+int main(){
+  while(~scanf("%d%d%d%lld", &a, &p, &d, &m)){
+    a %= p;
+    printf("%llu\n", work());
+  }
+}
+
+\end{verbatim}

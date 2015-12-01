@@ -1,0 +1,133 @@
+\subsubsection{分治nnt}
+\begin{verbatim}
+#include <cstdio>
+#include <vector>
+
+using namespace std;
+
+const int M = 15;
+const int N = 1 << M;  
+const int MOD = 152076289; 
+const int ROOT = 106;
+
+int qmod(int a, int n, int p){
+    int ret = 1;
+    while(n){
+        if (n & 1) ret = 1LL * ret * a % p;
+        a = 1LL * a * a % p;
+        n >>= 1;
+    }
+    return ret;
+}
+
+class NNT {
+    public:
+        NNT(int n, int mod, int root);
+        void forward(int a[]) {
+            work(a, r);
+        }
+        void reverse(int a[]) {
+            work(a, ir);
+            for (int i = 0; i < n; ++i) a[i] = 1LL * a[i] * n_rev % mod;
+        }
+    private:
+        int n, p, mod, n_rev;
+        vector<int> rb; 
+        int r[20]; 
+        int ir[20]; 
+        void work(int a[], int* roots);
+};
+
+NNT::NNT(int n, int mod, int root) : n(n) , mod(mod), rb(n) , p(0) {
+    n_rev = qmod(n, mod - 2, mod);
+    while ((1 << p) < n) ++p;
+    for(int i = 0; i < n; i++){
+        int x = i, y = 0;
+        for (int j = 0; j < p; ++j) {
+            y = (y << 1) | (x & 1);
+            x >>= 1;
+        }
+        rb[i] = y;
+    }
+    int inv = qmod(root, mod - 2, mod);
+    r[p - 1] = qmod(root, (mod - 1) / (1 << p), mod);
+    ir[p - 1] = qmod(inv, (mod - 1) / (1 << p), mod);
+    for(int i = p - 2; i >= 0; i--){
+        r[i] = 1LL * r[i + 1] * r[i + 1] % mod;
+        ir[i] = 1LL * ir[i + 1] * ir[i + 1] % mod;
+    }
+}
+
+void NNT::work(int a[], int* r) {
+    for (int i = 0; i < n; ++i) if (rb[i] > i) swap(a[i], a[rb[i]]);
+    for (int len = 2; len <= n; len <<= 1) {
+        int root = *r++;
+        for (int i = 0; i < n; i += len) {
+            int w = 1;
+            for (int j = 0; j < len / 2; ++j) {
+                int u = a[i + j];
+                int v = 1LL * a[i + j + len / 2] * w % mod;
+                a[i + j] = u + v < mod ? u + v : u + v - mod;
+                a[i + j + len / 2] = u - v >= 0 ? u - v : u - v + mod;
+                w = 1LL * w * root % mod;
+            }
+        }
+    }
+}
+
+NNT *nnt[M];
+
+int n, m;
+int fac[N], inv[N];
+int a[N], b[N];
+int dp[N], g[N];
+
+void pre(){
+    fac[0] = 1;
+    for(int i = 1; i < N; i++) fac[i] = 1LL * fac[i - 1] * i % MOD;
+    inv[N - 1] = qmod(fac[N - 1], MOD - 2, MOD);
+    for(int i = N - 1; i > 0; i--) inv[i - 1] = 1LL * inv[i] * i % MOD;
+    for(int i = 1; i < M; i++) nnt[i] = new NNT(1 << i, MOD, ROOT);
+}
+
+void init(){
+    for(int i = 1; i <= n; i++){
+        dp[i] = qmod(m + 1, i * (i - 1) / 2, MOD);
+        g[i] = dp[i];
+    }
+}
+
+void work(int l, int r){
+    if (l == r) return;
+    int mid = (l + r) / 2;
+    work(l, mid);
+    int p = 0, t = 1;
+    while(t <= (r - l + 1)) p++, t <<= 1;
+    for(int i = l; i <= mid; i++) a[i - l] = (1LL * dp[i] * inv[i - 1] % MOD + MOD) % MOD;
+    for(int i = mid - l + 1; i < t; i++) a[i] = 0;
+    for(int i = 0; i < t; i++) b[i] = (1LL * g[i] * inv[i] % MOD + MOD) % MOD;
+    nnt[p]->forward(a);
+    nnt[p]->forward(b);
+    for(int i = 0; i < t; i++) a[i] = 1LL * a[i] * b[i] % MOD;
+    nnt[p]->reverse(a);
+    for(int i = mid + 1; i <= r; i++){
+        dp[i] = (dp[i] - 1LL * a[i - l] * fac[i - 1]) % MOD;
+    }
+    work(mid + 1, r);
+}
+
+int main(){
+    pre();
+    int T;
+    scanf("%d", &T);
+    for(int cas = 1; cas <= T; cas++){
+        scanf("%d%d", &n, &m);
+        init();
+        work(1, n);
+        int ret = dp[n];
+        ret = (ret - 1LL * qmod(n, n - 2, MOD) * qmod(m, n - 1, MOD)) % MOD;
+        ret = (ret % MOD + MOD) % MOD;
+        printf("Case #%d: %d\n", cas, ret);
+    }
+}
+\end{verbatim}

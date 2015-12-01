@@ -1,0 +1,176 @@
+\subsubsection{NNT mod 1000000007}
+\begin{verbatim}
+#include <cstdio>
+#include <vector>
+#include <complex>
+#include <cmath>
+#include <cstring>
+
+using namespace std;
+
+typedef long long LL;
+
+const int N = 1 << 17;
+const int M = 3;
+const int MO = 1000000007;
+
+const int MOD[] = {998244353, 995622913, 786433}; 
+const int ROOT[] = {3, 5, 10};
+const LL M1 = 397550359381069386LL;
+const LL M2 = 596324591238590904LL;
+const LL MM = 993874950619660289LL;
+
+LL mul(LL x,LL y,LL z){
+    return (x * y - (LL)(x / (long double) z * y + 1e-3) * z + z) % z;
+}
+
+LL china(int x1, int x2){
+    return (mul(M1, x1, MM) + mul(M2, x2, MM)) % MM;
+}
+
+int qmod(int a, int n, int p){
+  int ret = 1;
+  while(n){
+    if (n & 1) ret = 1LL * ret * a % p;
+    a = 1LL * a * a % p;
+    n >>= 1;
+  }
+  return ret;
+}
+
+class NNT {
+    public:
+        NNT(int n, int mod, int root);
+        void forward(int a[]) {
+            work(a, r);
+        }
+        void reverse(int a[]) {
+            work(a, ir);
+            for (int i = 0; i < n; ++i) a[i] = 1LL * a[i] * n_rev % mod;
+        }
+    private:
+        int n, p, mod, n_rev;
+        vector<int> rb; 
+        int r[20]; 
+        int ir[20]; 
+        void work(int a[], int* roots);
+};
+
+NNT::NNT(int n, int mod, int root) : n(n) , mod(mod), rb(n) , p(0) {
+    n_rev = qmod(n, mod - 2, mod);
+    while ((1 << p) < n) ++p;
+    for(int i = 0; i < n; i++){
+        int x = i, y = 0;
+        for (int j = 0; j < p; ++j) {
+            y = (y << 1) | (x & 1);
+            x >>= 1;
+        }
+        rb[i] = y;
+    }
+    int inv = qmod(root, mod - 2, mod);
+    r[p - 1] = qmod(root, (mod - 1) / (1 << p), mod);
+    ir[p - 1] = qmod(inv, (mod - 1) / (1 << p), mod);
+    for(int i = p - 2; i >= 0; i--){
+        r[i] = 1LL * r[i + 1] * r[i + 1] % mod;
+        ir[i] = 1LL * ir[i + 1] * ir[i + 1] % mod;
+    }
+}
+
+void NNT::work(int a[], int* r) {
+    for (int i = 0; i < n; ++i) if (rb[i] > i) swap(a[i], a[rb[i]]);
+    for (int len = 2; len <= n; len <<= 1) {
+        int root = *r++;
+        for (int i = 0; i < n; i += len) {
+            int w = 1;
+            for (int j = 0; j < len / 2; ++j) {
+                int u = a[i + j];
+                int v = 1LL * a[i + j + len / 2] * w % mod;
+                a[i + j] = u + v < mod ? u + v : u + v - mod;
+                a[i + j + len / 2] = u - v >= 0 ? u - v : u - v + mod;
+                w = 1LL * w * root % mod;
+            }
+        }
+    }
+}
+
+int n, k;
+int cnt[5];
+int ans[3][N];
+int inv[N], fac[N];
+int iv;
+int a[3][N], b[N];
+int top;
+NNT *nnt[3];
+
+void pre(){
+  iv = qmod(1LL * MOD[0] * MOD[1] % MOD[2], MOD[2] - 2, MOD[2]);
+  fac[0] = 1;
+  for(int i = 1; i < N; i++){
+    fac[i] = 1LL * fac[i - 1] * i % MO;
+  }
+  inv[N - 1] = qmod(fac[N - 1], MO - 2, MO);
+  for(int i = N - 1; i > 0; i--){
+    inv[i - 1] = 1LL * inv[i] * i % MO;
+  }
+}
+
+int merge(int a, int b, int c){
+  int ret;
+  long long m1 = china(a, b);
+  int m2 = c;
+  int z = 1LL * ((m2 - m1) % MOD[2]) * iv % MOD[2];
+  z = (z % MOD[2] + MOD[2]) % MOD[2];
+  ret = (1LL * z * MOD[0] % MO * MOD[1] + m1) % MO;
+  return (ret % MO + MO) % MO;
+}
+
+int work(){
+  for(int i = 0; i < M; i++){
+    int up = (cnt[0] > n) ? n : cnt[0];
+    fill(a[i], a[i] + top, 0);
+    memcpy(a[i], inv, (up + 1) * 4);
+  }
+  for(int i = 1; i < 5; i++){
+    for(int j = 0; j < M; j++){
+      nnt[j]->forward(a[j]);
+      int up = (cnt[i] > n) ? n : cnt[i];
+      fill(b, b + top, 0);
+      memcpy(b, inv, (up + 1) * 4);
+      nnt[j]->forward(b);
+      for(int k = 0; k < top; k++) a[j][k] = 1LL * a[j][k] * b[k] % MOD[j];
+      nnt[j]->reverse(a[j]);
+    }
+    for(int k = 0; k <= n; k++){
+      int tmp = merge(a[0][k], a[1][k], a[2][k]);
+      for(int j = 0; j < M; j++) ::a[j][k] = tmp;
+    }
+    for(int j = 0; j < M; j++){
+      fill(a[j] + n + 1, a[j] + top, 0);
+    }
+  }
+  int tmp = merge(a[0][n], a[1][n], a[2][n]);
+  return 1LL * tmp * fac[n] % MO;
+}
+
+int main(){
+  pre();
+  int T;
+  scanf("%d", &T);
+  for(int cas = 1; cas <= T; cas++){
+    scanf("%d", &n);
+    for(int i = 0; i < 5; i++) scanf("%d", &cnt[i]);
+    top = 1;
+    while(top <= n * 2) top <<= 1;
+    for(int i = 0; i < M; i++) nnt[i] = new NNT(top, MOD[i], ROOT[i]);
+    int x = work();
+    if (cnt[0]){
+      cnt[0]--;
+      n--;
+      int y = work();
+      x = (x - y) % MO;
+    }
+    x = (x % MO + MO) % MO;
+    printf("Case #%d: %d\n", cas, x);
+  }
+}
+\end{verbatim}

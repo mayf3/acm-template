@@ -1,0 +1,61 @@
+\subsubsection{质数统计、求和}
+\begin{verbatim}
+#include <cstdio>
+#include <tr1/unordered_map>
+
+using namespace std::tr1;
+
+const int N = 2 * 5000000;
+
+typedef long long LL;
+
+LL n, m;
+
+int tot;
+int prime[N];
+bool vis[N];
+int v[N];
+unordered_map<int, LL> s;
+
+int main(){
+  tot = 0;
+  int tmp;
+  for(int i = 2; i < N; i++){
+    if (!vis[i]) prime[tot++] = i;
+    for(int j = 0; j < tot; j++){
+      tmp = i * prime[j];
+      if (tmp >= N) break;
+      vis[tmp] = true;
+      if (i % prime[j] == 0) break;
+    }
+  }
+  while(~scanf("%lld", &n)){
+    int i;
+    for(i = 1; i * i <= n; i++){
+      v[i] = n / i;
+    }
+    i--;
+    while(v[i]){
+      i++;
+      v[i] = v[i - 1] - 1;
+    }
+    int len = i;
+    s.clear();
+    for(int i = 1; i < len; i++){
+      s[v[i]] = 1LL * v[i] * (v[i] + 1) / 2 - 1;
+      //s[v[i]] = v[i] - 1;
+    }
+    for(int i = 0; prime[i] * prime[i] <= n; i++){
+      int p = prime[i];
+      LL sp = s[p - 1];
+      int p2 = 1LL * p * p;
+      for(int i = 1; i < len; i++){
+        if (v[i] < p2) break;
+        //s[v[i]] -= 1 * (s[v[i]/p] - sp);
+        s[v[i]] -= p * (s[v[i]/p] - sp);
+      }
+    }
+    printf("%lld\n", s[n]);
+  }
+}
+\end{verbatim}

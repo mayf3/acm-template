@@ -32,38 +32,42 @@ void gauss(int n, int m, double p[M][M]){
 }
 
 //整数答案不超过LL，可以用辗转相除法做高斯消元
-void gauss(int n, int m, T p[M][M], T& ret){
-    static T tmp[M][M];
-    static T *b[M];
-    rep(i, n){
-        rep(j, m){
+void gauss(int n, int m, int p[M][M], int& ret){
+    static int tmp[M][M];
+    static int *b[M];
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
             tmp[i][j] = p[i][j];
         }
     }
-    rep(i, n){
-        b[i] = tmp[i];
-    }
-    rep(i, n){
-        REP(j, i, n){
-            if (abs(b[j][i]) > abs(b[i][i])) swap(b[i], b[j]);
+    for(int i = 0; i < n; i++) b[i] = tmp[i];
+    ret = 1;
+    for(int i = 0; i < n; i++){
+        for(int j = i; j < n; j++){
+            if (abs(b[j][i]) > abs(b[i][i])){
+                ret *= -1;
+                swap(b[i], b[j]);
+            }
         }
         if (b[i][i] == 0){
             ret = 0;
             return;
         }
-        REP(j, i + 1, n){
+        for(int j = i + 1; j < n; j++){
             if (b[j][i] == 0) continue;
             while(b[j][i]){
-                if (abs(b[i][i]) > abs(b[j][i])) swap(b[i], b[j]);
-                LL rate = b[j][i] / b[i][i];
-                REP(k, i, m) b[j][k] = b[j][k] - b[i][k] * rate;
+                if (abs(b[i][i]) > abs(b[j][i])){
+                    ret *= -1;
+                    swap(b[i], b[j]);
+                }
+                int rate = b[j][i] / b[i][i];
+                for(int k = i; k < m; k++) b[j][k] = (b[j][k] - 1LL * b[i][k] * rate) % mod;
             }
         }
-        ret *= b[i][i];
-        ret = abs(ret) % MD;
+        ret = 1LL * ret * b[i][i] % mod;
     }
-    rep(i, n){
-        rep(j, m){
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
             p[i][j] = b[i][j];
         }
     }

@@ -1,0 +1,88 @@
+\subsubsection{二次无理数的连分数}
+\begin{verbatim}
+#include <cstdio>
+
+const int N = 1000000 + 1;
+const int MOD = 1000000007;
+
+struct Matrix{
+  int n, m;
+  int v[2][2];
+}c, tmp, now, ans;
+
+Matrix operator*(const Matrix &a, const Matrix &b){
+  c.n = a.n, c.m = b.m;
+  for(int i = 0; i < c.n; i++){
+    for(int j = 0; j < c.m; j++){
+      c.v[i][j] = 0;
+      for(int k = 0; k < a.m; k++){
+        c.v[i][j] = (c.v[i][j] + 1LL * a.v[i][k] * b.v[k][j]) % MOD;
+      }
+    }
+  }
+  return c;
+}
+
+int n, m;
+int l;
+int base;
+int a[N];
+
+void init(){
+  scanf("%d%d", &n, &m);
+}
+
+void build(int n){
+  base = 0;
+  while(base * base <= n) base++;
+  base--;
+  int k = base;
+  int n_k = n - k * k;
+  l = 0;
+  a[l++] = k;
+  while(true){
+    int i1 = n_k - k % n_k;
+    i1 += ((base - i1) / n_k) * n_k;
+    a[l++] = (i1 + k) / n_k;
+    if (a[l - 1] == 2 * base) break;
+    k = i1;
+    n_k = (n - k * k) / n_k;
+  }
+}
+
+void solve(){
+  int len = l - 1;
+  now.n = 2, now.m = 2;
+  now.v[0][0] = now.v[1][1] = 1;
+  now.v[0][1] = now.v[1][0] = 0;
+  for(int i = 1; i < l; i++){
+    tmp.n = 2, tmp.m = 2;
+    tmp.v[0][0] = a[i], tmp.v[0][1] = 1;
+    tmp.v[1][0] = 1, tmp.v[1][1] = 0;
+    now = now * tmp;
+  }
+  ans.n = 2, ans.m = 2;
+  ans.v[0][0] = a[0], ans.v[0][1] = 1;
+  ans.v[1][0] = 1, ans.v[1][1] = 0;
+  int t = m / len;
+  while(t){
+    if (t & 1) ans = ans * now;
+    now = now * now;
+    t >>= 1;
+  }
+  t = m % len;
+  for(int i = 0; i < t; i++){
+    tmp.n = 2, tmp.m = 2;
+    tmp.v[0][0] = a[i + 1], tmp.v[0][1] = 1;
+    tmp.v[1][0] = 1, tmp.v[1][1] = 0;
+    ans = ans * tmp;
+  }
+  printf("%d/%d\n", ans.v[0][0], ans.v[1][0]);
+}
+
+int main(){
+  init();
+  build(n);
+  solve();
+}
+\end{verbatim}

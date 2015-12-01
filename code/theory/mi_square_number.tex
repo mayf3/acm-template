@@ -1,0 +1,24 @@
+\subsubsection{最少需要平方数}
+\begin{verbatim}
+int Work(LL n)  {  
+    while(n % 4 == 0) n >>= 2;  
+    if(n % 8 == 7) return 4;  
+    LL i = 8, t = 9;  
+    while(t <= n)  
+    {  
+        while(n % t == 0) n /= t;  
+        i += 8;  
+        t += i;  
+    }  
+    if(n == 1) return 1;  
+    if(n % 2 == 0) n >>= 1;  
+    if(n % 4 == 3) return 3;  
+    LL k = 3;  
+    while(k * k <= n)  
+    {  
+        if(n % k == 0) return 3;  
+        k += 4;  
+    }  
+    return 2;  
+}  
+\end{verbatim}

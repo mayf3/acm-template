@@ -1,0 +1,190 @@
+\subsubsection{组合数取模扩展2}
+\begin{verbatim}
+#include <cstdio>
+#include <vector>
+
+typedef long long LL;
+
+using namespace std;
+
+const int N = 100000 + 1;
+const int C = 30;
+
+LL comb[C][C];
+
+struct Poly{
+  int c, mod;
+  int v[C];
+  Poly shift(int add){
+    Poly ret;
+    ret.c = c, ret.mod = mod;
+    for(int i = 0; i < c; i++){
+      ret.v[i] = 0;
+      int tmp = 1;
+      for(int j = i; j >= 0; j--){
+        ret.v[j] = (ret.v[j] + comb[i][j] % mod * tmp % mod * v[i]) % mod;
+        tmp = 1LL * tmp * add % mod;
+      }
+    }
+    return ret;
+  }
+};
+
+int n, m, mod;
+Poly poly[N];
+
+Poly operator*(const Poly &a, int d){
+  Poly ret;
+  ret.c = a.c;
+  ret.mod = a.mod;
+  for(int i = 0; i < ret.c; i++){
+    ret.v[i] = 1LL * a.v[i] * d % ret.mod;
+    if (i) ret.v[i] = (ret.v[i] + a.v[i - 1]) % ret.mod;
+  }
+  return ret;
+}
+
+Poly operator*(const Poly &a, const Poly &b){
+  Poly ret;
+  ret.c = a.c;
+  ret.mod = a.mod;
+  for(int i = 0; i < ret.c; i++) ret.v[i] = 0;
+  for(int i = 0; i < a.c; i++){
+    for(int j = 0; j < a.c - i; j++){
+      ret.v[i + j] = (ret.v[i + j] + 1LL * a.v[i] * b.v[j]) % ret.mod;
+    }
+  }
+  return ret;
+}
+
+int qmod(int a, int n, int p){
+  int ret = 1; 
+  while(n){
+    if (n & 1) ret = 1LL * ret * a % p;
+    a = 1LL * a * a % p;
+    n >>= 1;
+  }
+  return ret;
+}
+
+int ex_gcd(int a,int b,int &x,int &y) {
+    if (!a) return x = 0, y = 1, b;
+    int g = ex_gcd(b % a, a, x, y);
+    int t = y;
+    y = x;
+    x = t - (b / a) * y;
+    return g;
+}
+
+int modular(int a, int b) { 
+    return (a % b + b) % b; 
+}
+
+int invert(int x, int m)  { 
+    int a, b;
+    ex_gcd(x, m, a, b);
+    return modular(a, m);
+}
+
+int china(const vector<int>& m,const vector<int>& b) {
+    bool flag = false;
+    int x, y, i,d,result,a1,m1,a2,m2;
+    m1 = m[0]; a1 = b[0];
+  for(i = 1; i < m.size(); ++i){
+        m2 = m[i]; a2 = b[i];
+        d = ex_gcd(m1, m2, x, y );
+        if((a2-a1) % d != 0) flag = true;
+        result = (x * ((a2-a1) / d ) % m2 + m2 ) % m2;
+        a1 = a1 + m1 * result; 
+        m1 = (m1 * m2) / d;   
+        a1 = (a1 % m1 + m1) % m1;
+    }
+    if (flag) return -1;
+    else return a1;
+}
+
+int calc(int n, int p, int x){
+  Poly a = poly[p - 1], ret = poly[0];
+  int m = (n - n % p) / p;
+  for(int i = 0; (1 << i) <= m; i++){
+    if (m & (1 << i)) ret = a * ret.shift((1LL << i) * p % x);
+    a = a * a.shift((1LL << i) * p % x);
+  }
+  int ans = ret.v[0];
+  for(int i = m * p + 1; i <= n; i++){
+    ans = 1LL * ans * i % x;
+  }
+  return ans;
+}
+
+pair<int, int> work(int n, int p, int c){
+  int cnt = 0, ret = 1, x = 1;
+  for(int i = 0; i < c; i++) x *= p;
+  int tmp;
+  while(n){
+    cnt += n / p;
+    ret = 1LL * ret * calc(n, p, x) % x;
+    n /= p;
+  }
+  return make_pair(ret, cnt);
+}
+
+int calc(int n, int m, int p, int c){
+  int x = 1;
+  for(int i = 0; i < c; i++) x *= p;
+  poly[0].c = c, poly[0].mod = x;
+  for(int i = 0; i < c; i++) poly[0].v[i] = 0;
+  poly[0].v[0] = 1;
+  for(int i = 1; i < p; i++) poly[i] = poly[i - 1] * i;
+  pair<int, int> pa = work(n, p, c);
+  pair<int, int> pb = work(m, p, c);
+  pair<int, int> pc = work(n - m, p, c);
+  //printf("%d ", pa.first);
+  //printf("%d ", pb.first);
+  //printf("%d\n", pc.first);
+  int ret = pa.first, cnt = pa.second - pb.second - pc.second;
+  ret = 1LL * ret * invert(pb.first, x) % x;
+  ret = 1LL * ret * invert(pc.first, x) % x;
+  return 1LL * ret * qmod(p, cnt, x) % x;
+}
+
+void pre(){
+  for(int i = 0; i < C; i++){
+    comb[i][0] = comb[i][i] = 1;
+    for(int j = 1; j < i; j++){
+      comb[i][j] = comb[i - 1][j - 1] + comb[i - 1][j];
+    }
+  }
+}
+
+int main(){
+  pre();
+  while(~scanf("%d%d%d", &n, &m, &mod)){
+    if (mod == 1){
+      puts("0");
+      continue;
+    }
+    vector<pair<int, int> > fac;
+    vector<int> a, b;
+    for(int i = 2; i * i <= mod; i++){
+      if (mod % i) continue;
+      fac.push_back(make_pair(i, 0));
+      a.push_back(1);
+      while(mod % i == 0){
+        a[a.size() - 1] *= i;
+        fac[fac.size() - 1].second ++;
+        mod /= i;
+      }
+    }
+    if (mod > 1){
+      fac.push_back(make_pair(mod, 1));
+      a.push_back(mod);
+    }
+    for(int i = 0; i < fac.size(); i++){
+      b.push_back(calc(n, m, fac[i].first, fac[i].second));
+    }
+    int ret = china(a, b);
+    printf("%d\n", ret);
+  }
+}
+\end{verbatim}

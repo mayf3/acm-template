@@ -1,0 +1,83 @@
+\subsubsection{NNT}
+\begin{verbatim}
+
+const int N = 1 << 18;  
+const int MOD[] = {998244353, 995622913, 786433}; //7 * 17 * 2^23 + 1, 3 * 3 * 211 * 2 ^19 + 1;
+const int ROOT[] = {3, 5, 10};
+const LL M1 = 397550359381069386LL;
+const LL M2 = 596324591238590904LL;
+const LL MM = 993874950619660289LL;
+
+LL mul(LL x,LL y,LL z){
+    return (x * y - (LL)(x / (long double) z * y + 1e-3) * z + z) % z;
+}
+
+LL china(int x1, int x2){
+    return (mul(M1, x1, MM) + mul(M2, x2, MM)) % MM;
+}
+
+int qmod(int a, int n, int p){
+    int ret = 1;
+    while(n){
+        if (n & 1) ret = 1LL * ret * a % p;
+        a = 1LL * a * a % p;
+        n >>= 1;
+    }
+    return ret;
+}
+
+class NNT {
+    public:
+        NNT(int n, int mod, int root);
+        void forward(int a[]) {
+            work(a, r);
+        }
+        void reverse(int a[]) {
+            work(a, ir);
+            for (int i = 0; i < n; ++i) a[i] = 1LL * a[i] * n_rev % mod;
+        }
+    private:
+        int n, p, mod, n_rev;
+        vector<int> rb; //reversed_bits
+        int r[20];  // root
+        int ir[20]; //inv_root
+        void work(int a[], int* roots);
+};
+
+NNT::NNT(int n, int mod, int root) : n(n) , mod(mod), rb(n) , p(0) {
+    n_rev = qmod(n, mod - 2, mod);
+    while ((1 << p) < n) ++p;
+    for(int i = 0; i < n; i++){
+        int x = i, y = 0;
+        for (int j = 0; j < p; ++j) {
+            y = (y << 1) | (x & 1);
+            x >>= 1;
+        }
+        rb[i] = y;
+    }
+    int inv = qmod(root, mod - 2, mod);
+    r[p - 1] = qmod(root, (mod - 1) / (1 << p), mod);
+    ir[p - 1] = qmod(inv, (mod - 1) / (1 << p), mod);
+    for(int i = p - 2; i >= 0; i--){
+        r[i] = 1LL * r[i + 1] * r[i + 1] % mod;
+        ir[i] = 1LL * ir[i + 1] * ir[i + 1] % mod;
+    }
+}
+
+void NNT::work(int a[], int* r) {
+    for (int i = 0; i < n; ++i) if (rb[i] > i) swap(a[i], a[rb[i]]);
+    for (int len = 2; len <= n; len <<= 1) {
+        int root = *r++;
+        for (int i = 0; i < n; i += len) {
+            int w = 1;
+            for (int j = 0; j < len / 2; ++j) {
+                int u = a[i + j];
+                int v = 1LL * a[i + j + len / 2] * w % mod;
+                a[i + j] = u + v < mod ? u + v : u + v - mod;
+                a[i + j + len / 2] = u - v >= 0 ? u - v : u - v + mod;
+                w = 1LL * w * root % mod;
+            }
+        }
+    }
+}
+\end{verbatim}

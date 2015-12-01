@@ -1,62 +1,55 @@
 \subsubsection{FFT}
 \begin{verbatim}
-typedef complex<double> Comp;
-typedef Comp cp;
-
-const double PI = acos(-1);
-const Comp I(0, 1);
-
-const int N = 1<<18;
-Comp tmp[N];
-Comp a[N] = { }, b[N] = { };
-int n,m,d;
-LL ans;
-LL c[N];
-int v[N];
-
-void fft(Comp *a,int n,int f=1){
-    double arg = PI;
-    for(int k = n >> 1; k; k >>= 1, arg *= 0.5) {
-        cp wm(cos(arg), f * sin(arg)), w(1, 0);
-        for (int i = 0; i < n; i += k, w *= wm) {
-            int p = i << 1;
-            if (p >= n) p -= n;
-            for (int j = 0; j < k; ++j) tmp[i + j] = a[p + j] + w * a[p + k + j];
+typedef complex<long double> Comp;
+class FFT {
+    public:
+        FFT(int n);
+        void forward(Comp a[]) {
+            compute(a, r);
         }
-        rep(i,n) a[i] = tmp[i];
+        void reverse(Comp a[]){
+            compute(a, ir);
+            for (int i = 0; i < n; i++) a[i] /= n;
+        }
+    private:
+        int n, p;
+        vector<int> rb;
+        Comp r[20];
+        Comp ir[20];
+        void compute(Comp a[], Comp* r);
+};
+
+FFT::FFT(int n) : n(n) , rb(n) , p(0) {
+    while ((1 << p) < n) ++p;
+    for(int i = 0; i < n; i++){
+        int x = i, y = 0;
+        for (int j = 0; j < p; ++j) {
+            y = (y << 1) | (x & 1);
+            x >>= 1;
+        }
+        rb[i] = y;
+    }
+    for(int i = 0; i < p; i++){
+        long double angle = 2 * PI / (1 << (i + 1));
+        ir[i] = Comp(cos(angle), sin(angle));
+        r[i] = std::conj(ir[i]);
     }
 }
 
-int calc(int n){
-    fft(a,n,1);
-    fft(b,n,1);
-    rep(i,n) a[i] = a[i]*b[i];
-    fft(a,n,-1);
-    rep(i,n) a[i] /= n;
-}
-
-int main(){
-    int T;
-    scanf("%d",&T);
-    rep(cas,T){
-        scanf("%d",&n);
-        rep(i,n) scanf("%d",v+i);
-        int ma=0;
-        rep(i,n) ma=max(ma,v[i]);
-        rep(i,N) a[i]=b[i]=Comp(0,0);
-        rep(i,n) b[v[i]]=a[v[i]]+=Comp(1,0);
-        int top=1;
-        while(top<=ma*2) top*=2;
-        calc(top);
-        LL ans=(LL)n*(n-1)*(n-2)/6;
-        rep(i,top) c[i]=(LL)(a[i].real()+0.4);
-        rep(i,n) c[v[i]*2]--;
-        rep(i,top) c[i]/=2;
-        //rep(i,top) cout<<i <<' '<<c[i]<<endl;
-        REP(i,1,top) c[i]+=c[i-1];
-        rep(i,n) ans-=c[v[i]];
-        printf("%.7lf\n",ans/((double)n*(n-1)*(n-2)/6));
+void FFT::compute(Comp a[], Comp* r) {
+    for (int i = 0; i < n; ++i) if (rb[i] > i) swap(a[i], a[rb[i]]);
+    for (int len = 2; len <= n; len <<= 1) {
+        Comp root = *r++;
+        for (int i = 0; i < n; i += len) {
+            Comp w(1, 0);
+            for (int j = 0; j < len / 2; ++j) {
+                Comp u = a[i + j];
+                Comp v = a[i + j + len / 2] * w;
+                a[i + j] = u + v;
+                a[i + j + len / 2] = u - v;
+                w *= root;
+            }
+        }
     }
-    return 0;
 }
 \end{verbatim}

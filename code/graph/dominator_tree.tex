@@ -1,0 +1,222 @@
+\subsubsection{Dominator Tree}
+\begin{verbatim}
+#pragma comment(linker, "/STACK:102400000,102400000")
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <stack>
+#include <algorithm>
+
+using namespace std;
+
+const int N = 300000 + 1;
+
+struct DominatorTree{
+  int st;
+  int n, m;
+  int tot;
+  int dfn[N], id[N], fa[N];
+  int idom[N], semi[N]; 
+  int f[N], best[N];
+  vector<int> suc[N], pre[N];
+  vector<int> dom[N]; 
+
+  void dfs(int x){
+    dfn[x] = ++tot;
+    id[tot] = x;
+    for(int i = 0; i < suc[x].size(); i++){
+      int y = suc[x][i];
+      if (dfn[y]) continue;
+      fa[y] = x;
+      dfs(y);
+    }
+  }
+
+  int get(int x){
+    if (x == f[x]) return x;
+    int y = get(f[x]);
+    if (dfn[semi[best[x]]] > dfn[semi[best[f[x]]]]) best[x] = best[f[x]];
+    f[x] = y;
+    return y;
+  }
+
+  void tarjan(){
+    for(int i = tot; i > 1; i--){
+      int y = id[i];
+      int x = fa[y];
+      for(int j = 0; j < pre[y].size(); j++){
+        int z = pre[y][j];
+        if (dfn[z] == 0) continue;
+        get(z);
+        if (dfn[semi[best[z]]] < dfn[semi[y]]) semi[y] = semi[best[z]];
+      }
+      dom[semi[y]].push_back(y);
+      f[y] = x;
+      for(int j = 0; j < dom[x].size(); j++){
+        int z = dom[x][j];
+        get(z);
+        if (dfn[semi[best[z]]] < dfn[x]) idom[z] = best[z];
+        else idom[z] = x;
+      }
+      dom[x].clear();
+    }
+    for(int i = 2; i < tot + 1; i++){
+      int u = id[i];
+      if (idom[u] != semi[u]) idom[u] = idom[idom[u]];
+      dom[idom[u]].push_back(u);
+    }
+    idom[id[1]] = 0;
+  }
+
+  void init(int _n, vector<pair<int, int> > edges, int _st){
+    n = _n, m = edges.size(), st = _st;
+    for(int i = 1; i <= n; i++){
+      f[i] = i;
+      best[i] = i;
+      suc[i].clear();
+      pre[i].clear();
+      dom[i].clear();
+      dfn[i] = 0;
+      id[i] = 0;
+      semi[i] = i;
+      idom[i] = i;
+    }
+    for(int i = 0; i < m; i++){
+      int x, y;
+      x = edges[i].first;
+      y = edges[i].second;
+      suc[x].push_back(y);
+      pre[y].push_back(x);
+    }
+  }
+
+  void solve(){
+    tot = 0;
+    dfs(st);
+    tarjan();
+  }
+}dt;
+
+int n, m;
+int tot, col;
+vector<int> E[N];
+bool ok[N];
+stack<int> sta;
+
+int dfn[N], low[N];
+bool in_stack[N];
+
+int co[N];
+int id[N]; 
+int iv[N];
+
+void dfs(int u){
+  dfn[u] = low[u] = tot++;
+  in_stack[u] = true;
+  sta.push(u);
+  for(int i = 0; i < E[u].size(); i++){
+    int v = E[u][i];
+    if (dfn[v] == -1){
+      dfs(v);
+      low[u] = min(low[u], low[v]);
+    }
+    else if (in_stack[v]){
+      low[u] = min(low[u], dfn[v]);
+    }
+  }
+  if (low[u] == dfn[u]){
+    vector<int> v; 
+    vector<pair<int, int> > edges;
+    int cnt = 0;
+    int st = -1;
+    while(true){
+      int x = sta.top(); sta.pop();
+      v.push_back(x);
+      co[x] = col;
+      id[x] = ++cnt;
+      iv[cnt] = x;
+      in_stack[x] = false;
+      if (x < n && st == -1) st = id[x];
+      if (x == u) break;
+    }
+    col++;
+
+    edges.clear();
+    for(int i = 0; i < v.size(); i++){
+      int x = v[i];
+      for(int j = 0; j < E[x].size(); j++){
+        int y = E[x][j];
+        if (co[y] != col - 1) continue;
+        edges.push_back(make_pair(id[x], id[y]));
+      }
+    }
+    dt.init(cnt, edges, st);
+    dt.solve();
+    for(int i = 1; i <= cnt; i++){
+      if (dt.dom[i].size() == 0) continue;
+      int x = iv[i];
+      if (x >= n) ok[x - n] = true;
+    }
+
+    edges.clear();
+    for(int i = 0; i < v.size(); i++){
+      int x = v[i];
+      for(int j = 0; j < E[x].size(); j++){
+        int y = E[x][j];
+        if (co[y] != col - 1) continue;
+        edges.push_back(make_pair(id[y], id[x]));
+      }
+    }
+    dt.init(cnt, edges, st);
+    dt.solve();
+    for(int i = 1; i <= cnt; i++){
+      if (dt.dom[i].size() == 0) continue;
+      int x = iv[i];
+      if (x >= n) ok[x - n] = true;
+    }
+  }
+}
+
+void init(){
+  for(int i = 0; i < n + m; i++){
+    E[i].clear();
+  }
+  for(int i = 0; i < m; i++){
+    int x, y;
+    scanf("%d%d", &x, &y);
+    x--, y--;
+    E[x].push_back(n + i);
+    E[n + i].push_back(y);
+  }
+}
+
+void solve(){
+  for(int i = 0; i < n + m; i++){
+    ok[i] = false;
+    dfn[i] = low[i] = -1;
+    in_stack[i] = false;
+    co[i] = -1;
+  }
+  tot = 0;
+  col = 0;
+  for(int i = 0; i < n + m; i++){
+    if (dfn[i] != -1) continue;
+    dfs(i);
+  }
+  for(int i = 0; i < m; i++){
+    if (ok[i]) putchar('1');
+    else putchar('0');
+  }
+  puts("");
+}
+
+int main(){
+  int T;
+  scanf("%d", &T);
+  for(int cas = 1; cas <= T; cas++){
+    scanf("%d%d", &n, &m);
+    init();
+    solve();
+  }
+}
+\end{verbatim}

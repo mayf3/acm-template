@@ -1,0 +1,82 @@
+\subsubsection{根据前m项求第n项}
+\begin{verbatim}
+#include <cstdio>
+
+typedef long long LL;
+
+const int N = 222;
+const int MOD = 1234567891;
+
+int k, a, n, d;
+int fac[N], inv[N];
+int f[N], g[N], h[N];
+
+int qmod(int a, int n, int p = MOD){
+  int ret = 1;
+  while(n){
+    if (n & 1) ret = 1LL * ret * a % p;
+    a = 1LL * a * a % p;
+    n >>= 1;
+  }
+  return ret;
+}
+
+int C(int n, int m){
+  if (n < m) return 0;
+  return 1LL * fac[n] * inv[m] % MOD * inv[n - m] % MOD;
+}
+
+// calc the Nth element from f[0] ~ f[m] (f[x] = sigma(ai * x ^ i, 0 <= i <= m);
+int calc(LL n, int m, int f[]){
+  static int pre[N], suf[N];
+  if (n <= m) return f[n];
+  pre[0] = n % MOD;
+  for(int i = 1; i <= m; i++) pre[i] = 1LL * pre[i - 1] * ((n - i) % MOD) % MOD;
+  suf[m] = (n - m) % MOD;
+  for(int i = m - 1; i >= 0; i--) suf[i] = 1LL * suf[i + 1] * ((n - i) % MOD) % MOD;
+  int ret = 0;
+  int now = (m & 1) ? -1 : 1;
+  for(int i = 0; i <= m; i++){
+    int tmp = 1LL * now * f[i] * inv[i] % MOD * inv[m - i] % MOD; 
+    if (i) tmp = 1LL * tmp * pre[i - 1] % MOD;
+    if (i < m) tmp = 1LL * tmp * suf[i + 1] % MOD;
+    ret = (0LL + ret + tmp) % MOD;
+    now = -now;
+  }
+  return ret;
+}
+
+// calc 0! ~ m! and 1/0! ~ 1/m!
+void init(){
+  fac[0] = 1;
+  for(int i = 1; i < N; i++) fac[i] = 1LL * fac[i - 1] * i % MOD;
+  inv[N - 1] = qmod(fac[N - 1], MOD - 2);
+  for(int i = N - 2; i >= 0; i--){
+    inv[i] = 1LL * inv[i + 1] * (i + 1) % MOD;
+  }
+}
+
+int main(){
+  init();
+  int T;
+  scanf("%d", &T);
+  while(~scanf("%d%d%d%d", &k, &a, &n, &d)){
+    f[0] = 0;
+    for(int i = 1; i <= k + 3; i++){
+      f[i] = (0LL + f[i - 1] + qmod(i, k)) % MOD;
+    }
+    g[0] = 0;
+    for(int i = 1; i <= k + 3; i++){
+      g[i] = (0LL + g[i - 1] + f[i]) % MOD;
+    }
+    h[0] = calc(a, k + 2, g);
+    for(int i = 1; i <= k + 3; i++){
+      h[i] = (0LL + h[i - 1] + calc(a + 1LL * i * d, k + 2, g)) % MOD;
+      h[i] = (1LL * h[i] % MOD + MOD) % MOD;
+    }
+    int ret = calc(n, k + 3 , h);
+    ret = (1LL * ret % MOD + MOD) % MOD;
+    printf("%d\n", ret);
+  }
+}
+\end{verbatim}
