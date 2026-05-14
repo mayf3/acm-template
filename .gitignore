@@ -4,3 +4,9 @@
 codelibrary*
 !codelibrary.tex
 !codelibrary.pdf
+# Environment files (security)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
